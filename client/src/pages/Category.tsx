@@ -5,6 +5,32 @@ import { Link, useParams } from "wouter";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const cardReveal = {
+  hidden: { opacity: 0, y: 30, scale: 0.95, filter: "blur(6px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] },
+  },
+};
+
 export default function Category() {
   const params = useParams<{ slug: string }>();
   const categoryQuery = trpc.categories.getBySlug.useQuery({ slug: params.slug || "" });
@@ -26,9 +52,10 @@ export default function Category() {
             <ArrowLeft className="w-4 h-4" /> Voltar ao catálogo
           </Link>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
           >
             <h1 className="text-headline text-white mb-4">{category?.name || "Categoria"}</h1>
             <p className="text-body-large text-white/50 max-w-2xl">
@@ -41,13 +68,17 @@ export default function Category() {
       {/* Products */}
       <section className="py-16 bg-[#1D1D1F]">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product, index) => (
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {products.map((product) => (
               <motion.div
                 key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
+                variants={cardReveal}
               >
                 <Link href={`/produto/${product.slug}`}>
                   <div className="bento-card group cursor-pointer h-full flex flex-col">
@@ -87,7 +118,7 @@ export default function Category() {
                 </Link>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 

@@ -13,6 +13,32 @@ const categoryIcons: Record<string, React.ReactNode> = {
   BarChart3: <BarChart3 className="w-5 h-5" />,
 };
 
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const cardReveal = {
+  hidden: { opacity: 0, y: 30, scale: 0.95, filter: "blur(6px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] },
+  },
+};
+
 export default function Softwares() {
   const productsQuery = trpc.products.byType.useQuery({ type: "software" });
   const categoriesQuery = trpc.categories.list.useQuery();
@@ -34,9 +60,10 @@ export default function Softwares() {
       <section className="pt-32 pb-16 bg-[#0a0a0a]">
         <div className="container text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
           >
             <h1 className="text-headline text-white mb-4">Catálogo de Softwares</h1>
             <p className="text-body-large text-white/50 max-w-2xl mx-auto">
@@ -49,7 +76,12 @@ export default function Softwares() {
       {/* Filters */}
       <section className="py-8 bg-[#1D1D1F] border-b border-white/5 sticky top-14 z-40 glass">
         <div className="container">
-          <div className="flex items-center gap-3 overflow-x-auto pb-2">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            className="flex items-center gap-3 overflow-x-auto pb-2"
+          >
             <button
               onClick={() => setSelectedCategory(null)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
@@ -74,20 +106,24 @@ export default function Softwares() {
                 {cat.name}
               </button>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Products Grid */}
       <section className="py-16 bg-[#1D1D1F]">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product, index) => (
+          <motion.div
+            key={selectedCategory || "all"}
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {filteredProducts.map((product) => (
               <motion.div
                 key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
+                variants={cardReveal}
               >
                 <Link href={`/produto/${product.slug}`}>
                   <div className="bento-card group cursor-pointer h-full flex flex-col">
@@ -120,7 +156,7 @@ export default function Softwares() {
                 </Link>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {filteredProducts.length === 0 && !productsQuery.isLoading && (
             <div className="text-center py-20">

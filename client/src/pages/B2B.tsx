@@ -6,6 +6,32 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const cardReveal = {
+  hidden: { opacity: 0, y: 25, scale: 0.94, filter: "blur(6px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] },
+  },
+};
+
 export default function B2B() {
   const submitLead = trpc.b2b.submit.useMutation();
   const [form, setForm] = useState({
@@ -48,21 +74,36 @@ export default function B2B() {
         </div>
         <div className="container relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0, y: 40, filter: "blur(12px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
             className="max-w-3xl"
           >
-            <p className="text-[#0071E3] text-sm font-medium tracking-wide uppercase mb-4">
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-[#0071E3] text-sm font-medium tracking-wide uppercase mb-4"
+            >
               Soluções Corporativas
-            </p>
-            <h1 className="text-headline text-white mb-6">
+            </motion.p>
+            <motion.h1
+              initial={{ opacity: 0, y: 25, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              className="text-headline text-white mb-6"
+            >
               Tecnologia sob medida
               <br />para sua empresa.
-            </h1>
-            <p className="text-body-large text-white/50 max-w-2xl">
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="text-body-large text-white/50 max-w-2xl"
+            >
               Pacotes corporativos com licenciamento em volume, suporte dedicado e condições especiais para equipes de todos os tamanhos.
-            </p>
+            </motion.p>
           </motion.div>
         </div>
       </section>
@@ -70,14 +111,17 @@ export default function B2B() {
       {/* Benefits */}
       <section className="py-20 bg-[#1D1D1F]">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
             {benefits.map((item, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                variants={cardReveal}
                 className="bento-card text-center"
               >
                 <div className="w-12 h-12 rounded-2xl bg-[#0071E3]/10 flex items-center justify-center text-[#0071E3] mx-auto mb-4">
@@ -87,7 +131,7 @@ export default function B2B() {
                 <p className="text-xs text-white/50">{item.desc}</p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -96,10 +140,11 @@ export default function B2B() {
         <div className="container">
           <div className="max-w-2xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
               className="text-center mb-12"
             >
               <h2 className="text-title text-white mb-4">Solicitar Orçamento</h2>
@@ -109,10 +154,10 @@ export default function B2B() {
             </motion.div>
 
             <motion.form
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
+              initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.7, delay: 0.15, ease: [0.23, 1, 0.32, 1] }}
               onSubmit={handleSubmit}
               className="space-y-5"
             >

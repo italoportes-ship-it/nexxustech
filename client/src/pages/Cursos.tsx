@@ -17,6 +17,32 @@ const levelColors: Record<string, string> = {
   advanced: "bg-red-500/10 text-red-400",
 };
 
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const cardReveal = {
+  hidden: { opacity: 0, y: 35, scale: 0.94, filter: "blur(8px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.6, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] },
+  },
+};
+
 export default function Cursos() {
   const coursesQuery = trpc.products.byType.useQuery({ type: "course" });
   const courses = coursesQuery.data || [];
@@ -29,9 +55,10 @@ export default function Cursos() {
       <section className="pt-32 pb-16 bg-[#0a0a0a]">
         <div className="container text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
           >
             <h1 className="text-headline text-white mb-4">Cursos Digitais</h1>
             <p className="text-body-large text-white/50 max-w-2xl mx-auto">
@@ -44,13 +71,17 @@ export default function Cursos() {
       {/* Courses Grid */}
       <section className="py-16 bg-[#1D1D1F]">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {courses.map((course, index) => (
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
+            {courses.map((course) => (
               <motion.div
                 key={course.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.08 }}
+                variants={cardReveal}
               >
                 <Link href={`/produto/${course.slug}`}>
                   <div className="bento-card group cursor-pointer h-full">
@@ -96,7 +127,7 @@ export default function Cursos() {
                 </Link>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {courses.length === 0 && !coursesQuery.isLoading && (
             <div className="text-center py-20">

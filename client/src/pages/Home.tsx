@@ -1,10 +1,10 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
 import { Shield, Code, Palette, BarChart3, ArrowRight, Zap, Globe, Award } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   Shield: <Shield className="w-6 h-6" />,
@@ -13,18 +13,58 @@ const categoryIcons: Record<string, React.ReactNode> = {
   BarChart3: <BarChart3 className="w-6 h-6" />,
 };
 
+// Reusable animation variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+};
+
+const fadeInScale = {
+  hidden: { opacity: 0, scale: 0.92, filter: "blur(8px)" },
+  visible: { opacity: 1, scale: 1, filter: "blur(0px)" },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 30, filter: "blur(6px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.6, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] },
+  },
+};
+
 export default function Home() {
   const categoriesQuery = trpc.categories.list.useQuery();
   const productsQuery = trpc.products.list.useQuery();
   const categories = categoriesQuery.data || [];
   const products = (productsQuery.data || []).slice(0, 6);
 
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"] as any,
+  });
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
+  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, 60]);
+
   return (
     <div className="min-h-screen bg-[#1D1D1F]">
       <Navbar />
 
-      {/* Hero Section - Apple Style */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-14">
+      {/* Hero Section - Apple Style with parallax */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden pt-14">
         {/* Background gradient */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#1D1D1F] to-[#1D1D1F]" />
@@ -32,27 +72,50 @@ export default function Home() {
           <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#0071E3]/5 rounded-full blur-[80px]" />
         </div>
 
-        <div className="container relative z-10 text-center">
+        <motion.div
+          style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
+          className="container relative z-10 text-center"
+        >
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+            initial={{ opacity: 0, y: 40, filter: "blur(12px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
             className="max-w-4xl mx-auto"
           >
-            <p className="text-[#0071E3] text-sm font-medium tracking-wide uppercase mb-6">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-[#0071E3] text-sm font-medium tracking-wide uppercase mb-6"
+            >
               Plataforma Premium de Tecnologia
-            </p>
-            <h1 className="text-display text-white mb-6">
+            </motion.p>
+            <motion.h1
+              initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.8, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
+              className="text-display text-white mb-6"
+            >
               Softwares e cursos
               <br />
               <span className="bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">
                 que transformam negócios.
               </span>
-            </h1>
-            <p className="text-body-large text-white/60 max-w-2xl mx-auto mb-10">
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
+              className="text-body-large text-white/60 max-w-2xl mx-auto mb-10"
+            >
               Descubra as melhores soluções em infraestrutura, desenvolvimento, design e análise de dados. Para profissionais e empresas que exigem excelência.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.7 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
               <Link href="/softwares">
                 <span className="apple-btn apple-btn-primary text-base px-8 py-3.5">
                   Explorar Soluções
@@ -63,19 +126,20 @@ export default function Home() {
                   Soluções Corporativas <ArrowRight className="w-4 h-4 inline ml-1" />
                 </span>
               </Link>
-            </div>
+            </motion.div>
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* Categories - Bento Grid */}
+      {/* Categories - Bento Grid with staggered scroll animations */}
       <section className="py-24 bg-[#0a0a0a]">
         <div className="container">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
             className="text-center mb-16"
           >
             <h2 className="text-headline text-white mb-4">
@@ -86,14 +150,17 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {categories.map((cat, index) => (
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
+            {categories.map((cat) => (
               <motion.div
                 key={cat.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                variants={staggerItem}
               >
                 <Link href={`/categoria/${cat.slug}`}>
                   <div className="bento-card group cursor-pointer h-full">
@@ -117,18 +184,19 @@ export default function Home() {
                 </Link>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* Featured Products with staggered scroll animations */}
       <section className="py-24 bg-[#1D1D1F]">
         <div className="container">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
             className="text-center mb-16"
           >
             <h2 className="text-headline text-white mb-4">
@@ -139,14 +207,18 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product, index) => (
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {products.map((product) => (
               <motion.div
                 key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.08 }}
+                variants={fadeInScale}
+                transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
               >
                 <Link href={`/produto/${product.slug}`}>
                   <div className="bento-card group cursor-pointer h-full flex flex-col">
@@ -179,26 +251,34 @@ export default function Home() {
                 </Link>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
 
-          <div className="text-center mt-12">
+          <motion.div
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-center mt-12"
+          >
             <Link href="/softwares">
               <span className="apple-btn apple-btn-primary">
                 Ver Todos os Produtos
               </span>
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Trust Section */}
+      {/* Trust Section with staggered animations */}
       <section className="py-24 bg-[#0a0a0a]">
         <div className="container">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
             className="text-center mb-16"
           >
             <h2 className="text-headline text-white mb-4">
@@ -206,7 +286,13 @@ export default function Home() {
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          >
             {[
               {
                 icon: <Zap className="w-6 h-6" />,
@@ -226,10 +312,8 @@ export default function Home() {
             ].map((item, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                variants={fadeInScale}
+                transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
                 className="text-center"
               >
                 <div className="w-14 h-14 rounded-2xl bg-[#0071E3]/10 flex items-center justify-center text-[#0071E3] mx-auto mb-5">
@@ -239,7 +323,7 @@ export default function Home() {
                 <p className="text-sm text-white/50 leading-relaxed">{item.description}</p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -250,10 +334,11 @@ export default function Home() {
         </div>
         <div className="container relative z-10 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
           >
             <h2 className="text-headline text-white mb-4">
               Pronto para transformar seu negócio?
@@ -261,7 +346,13 @@ export default function Home() {
             <p className="text-body-large text-white/50 max-w-xl mx-auto mb-10">
               Converse com nossa equipe e descubra as melhores soluções para sua empresa.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
               <Link href="/b2b">
                 <span className="apple-btn apple-btn-primary text-base px-8 py-3.5">
                   Solicitar Orçamento
@@ -272,7 +363,7 @@ export default function Home() {
                   Ver Soluções <ArrowRight className="w-4 h-4 inline ml-1" />
                 </span>
               </Link>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>

@@ -44,3 +44,6 @@
 - [x] Gerenciamento de produtos e cursos
 - [x] Visualização de pedidos
 - [x] Gerenciamento de preços
+
+## Melhorias Visuais
+- [x] Animações de rolagem (scroll animations) nos blocos Bento Grid e textos principais
