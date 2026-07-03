@@ -234,12 +234,19 @@
     border-radius: var(--apple-radius-xl);
     border: 1px solid var(--border);
     padding: var(--apple-spacing-lg);
-    transition: transform 0.4s var(--apple-transition), box-shadow 0.4s var(--apple-transition);
+    transition: transform 0.4s var(--apple-transition), box-shadow 0.4s var(--apple-transition), border-color 0.3s ease;
+    will-change: transform;
   }
 
   .bento-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--apple-shadow-xl);
+    border-color: oklch(1 0 0 / 18%);
+  }
+
+  .bento-card:active {
+    transform: translateY(-2px) scale(0.98);
+    transition-duration: 0.15s;
   }
 
   /* Apple-style button */
@@ -253,6 +260,12 @@
     font-weight: 500;
     letter-spacing: -0.01em;
     transition: all 0.2s var(--apple-transition);
+    will-change: transform;
+  }
+
+  .apple-btn:active {
+    transform: scale(0.97);
+    transition-duration: 0.1s;
   }
 
   .apple-btn-primary {
@@ -263,6 +276,13 @@
   .apple-btn-primary:hover {
     background: var(--apple-blue-hover);
     transform: scale(0.98);
+    box-shadow: 0 4px 20px rgba(0, 113, 227, 0.3);
+  }
+
+  .apple-btn-primary:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(0, 113, 227, 0.2);
+    transition-duration: 0.1s;
   }
 
   .apple-btn-secondary {
@@ -273,6 +293,12 @@
 
   .apple-btn-secondary:hover {
     text-decoration: underline;
+  }
+
+  .apple-btn-secondary:active {
+    transform: scale(0.97);
+    opacity: 0.8;
+    transition-duration: 0.1s;
   }
 
   /* Typography helpers */

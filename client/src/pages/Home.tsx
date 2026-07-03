@@ -5,6 +5,7 @@ import { Link } from "wouter";
 import { Shield, Code, Palette, BarChart3, ArrowRight, Zap, Globe, Award } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import AnimatedCounter from "@/components/AnimatedCounter";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   Shield: <Shield className="w-6 h-6" />,
@@ -321,6 +322,38 @@ export default function Home() {
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
                 <p className="text-sm text-white/50 leading-relaxed">{item.description}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Stats Section with animated counters */}
+      <section className="py-20 bg-[#1D1D1F] border-y border-white/5">
+        <div className="container">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8"
+          >
+            {[
+              { end: 500, suffix: "+", label: "Clientes Ativos" },
+              { end: 16, suffix: "", label: "Soluções Disponíveis" },
+              { end: 99, suffix: "%", label: "Satisfação" },
+              { end: 24, suffix: "/7", label: "Suporte" },
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                variants={fadeInScale}
+                transition={{ duration: 0.5 }}
+                className="text-center"
+              >
+                <p className="text-3xl md:text-4xl font-bold text-white mb-1">
+                  <AnimatedCounter end={stat.end} duration={2000} suffix={stat.suffix} />
+                </p>
+                <p className="text-sm text-white/40">{stat.label}</p>
               </motion.div>
             ))}
           </motion.div>

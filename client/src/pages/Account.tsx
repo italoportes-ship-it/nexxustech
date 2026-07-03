@@ -5,6 +5,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
 import { Package, ShoppingCart, User, LogOut, Clock, CheckCircle, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import AnimatedCounter from "@/components/AnimatedCounter";
 
 const statusLabels: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   pending: { label: "Pendente", color: "text-yellow-400", icon: <Clock className="w-4 h-4" /> },
@@ -48,21 +49,28 @@ export default function Account() {
               </button>
             </div>
 
-            {/* Quick Stats */}
+            {/* Quick Stats with animated counters */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
               <div className="bento-card !p-5 text-center">
-                <p className="text-2xl font-bold text-white">{orders.length}</p>
+                <p className="text-2xl font-bold text-white">
+                  <AnimatedCounter end={orders.length} duration={1500} />
+                </p>
                 <p className="text-xs text-white/50 mt-1">Pedidos Realizados</p>
               </div>
               <div className="bento-card !p-5 text-center">
                 <p className="text-2xl font-bold text-white">
-                  {orders.filter(o => o.status === "paid").length}
+                  <AnimatedCounter end={orders.filter(o => o.status === "paid").length} duration={1500} />
                 </p>
                 <p className="text-xs text-white/50 mt-1">Produtos Ativos</p>
               </div>
               <div className="bento-card !p-5 text-center">
                 <p className="text-2xl font-bold text-white">
-                  R$ {orders.filter(o => o.status === "paid").reduce((s, o) => s + parseFloat(o.totalAmount), 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                  <AnimatedCounter
+                    end={orders.filter(o => o.status === "paid").reduce((s, o) => s + parseFloat(o.totalAmount), 0)}
+                    duration={2000}
+                    decimals={2}
+                    prefix="R$ "
+                  />
                 </p>
                 <p className="text-xs text-white/50 mt-1">Total Investido</p>
               </div>

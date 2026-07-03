@@ -47,3 +47,6 @@
 
 ## Melhorias Visuais
 - [x] Animações de rolagem (scroll animations) nos blocos Bento Grid e textos principais
+- [x] Micro-interações nos botões CTA (scale 0.97 no :active)
+- [x] Animação de contagem progressiva nos números estatísticos
+- [x] Transições suaves entre páginas com AnimatePresence
