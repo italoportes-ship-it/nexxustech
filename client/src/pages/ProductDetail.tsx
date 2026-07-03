@@ -1,10 +1,11 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { Link, useParams } from "wouter";
-import { ArrowLeft, Check, ShoppingCart, BookOpen, Signal } from "lucide-react";
+import { Check, ShoppingCart, BookOpen, Signal } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -73,9 +74,10 @@ export default function ProductDetail() {
 
       <section className="pt-24 md:pt-32 pb-16 md:pb-24">
         <div className="container">
-          <Link href={product.type === "course" ? "/cursos" : "/softwares"} className="inline-flex items-center gap-2 text-sm text-[#0071E3] mb-8 hover:underline">
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Link>
+          <Breadcrumbs items={[
+            { label: product.type === "course" ? "Cursos" : "Softwares", href: product.type === "course" ? "/cursos" : "/softwares" },
+            { label: product.name },
+          ]} />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16">
             {/* Left - Product Visual */}

@@ -1,8 +1,10 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import PullToRefresh from "@/components/PullToRefresh";
 import { trpc } from "@/lib/trpc";
 import { Link, useParams } from "wouter";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 const fadeInUp = {
@@ -48,9 +50,10 @@ export default function Category() {
       {/* Header */}
       <section className="pt-24 md:pt-32 pb-10 md:pb-16 bg-secondary">
         <div className="container">
-          <Link href="/softwares" className="inline-flex items-center gap-2 text-sm text-[#0071E3] mb-6 hover:underline">
-            <ArrowLeft className="w-4 h-4" /> Voltar ao catálogo
-          </Link>
+          <Breadcrumbs items={[
+            { label: "Softwares", href: "/softwares" },
+            { label: category?.name || "Categoria" },
+          ]} />
           <motion.div
             variants={fadeInUp}
             initial="hidden"
@@ -66,6 +69,7 @@ export default function Category() {
       </section>
 
       {/* Products */}
+      <PullToRefresh onRefresh={async () => { await productsQuery.refetch(); }}>
       <section className="py-10 md:py-16 bg-background">
         <div className="container">
           <motion.div
@@ -121,6 +125,7 @@ export default function Category() {
           </motion.div>
         </div>
       </section>
+      </PullToRefresh>
 
       <Footer />
     </div>

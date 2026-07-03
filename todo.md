@@ -54,3 +54,6 @@
 - [x] Seção de depoimentos com carrossel automático na landing page
 - [x] Modo claro/escuro com toggle e Design Tokens light
 - [x] Adaptar layout mobile completo e corrigir erros de responsividade
+- [x] Lazy loading nas páginas com React.lazy() e Suspense
+- [x] Breadcrumbs de navegação nas páginas internas
+- [x] Pull-to-refresh no mobile nas listagens de produtos

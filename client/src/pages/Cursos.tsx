@@ -1,5 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import PullToRefresh from "@/components/PullToRefresh";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
 import { ArrowRight, BookOpen, Clock, Signal } from "lucide-react";
@@ -53,12 +55,14 @@ export default function Cursos() {
 
       {/* Header */}
       <section className="pt-24 md:pt-32 pb-10 md:pb-16 bg-secondary">
-        <div className="container text-center">
+        <div className="container">
+          <Breadcrumbs items={[{ label: "Cursos" }]} />
           <motion.div
             variants={fadeInUp}
             initial="hidden"
             animate="visible"
             transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
+            className="text-center"
           >
             <h1 className="text-headline text-foreground mb-4">Cursos Digitais</h1>
             <p className="text-body-large text-muted-foreground max-w-2xl mx-auto">
@@ -69,6 +73,7 @@ export default function Cursos() {
       </section>
 
       {/* Courses Grid */}
+      <PullToRefresh onRefresh={async () => { await coursesQuery.refetch(); }}>
       <section className="py-10 md:py-16 bg-background">
         <div className="container">
           <motion.div
@@ -136,6 +141,7 @@ export default function Cursos() {
           )}
         </div>
       </section>
+      </PullToRefresh>
 
       <Footer />
     </div>
