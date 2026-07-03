@@ -1,6 +1,6 @@
 import { eq, and, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, categories, products, orders, orderItems, cartItems, b2bLeads, chatMessages } from "../drizzle/schema";
+import { InsertUser, users, categories, products, orders, orderItems, cartItems, b2bLeads, chatMessages, reviews, newsletterSubscribers } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -276,4 +276,48 @@ export async function getAllUsers() {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(users).orderBy(desc(users.createdAt));
+}
+
+// ===== REVIEWS =====
+export async function getProductReviews(productId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(reviews).where(eq(reviews.productId, productId)).orderBy(desc(reviews.createdAt));
+}
+
+export async function createReview(data: { userId: number; productId: number; rating: number; comment?: string; userName?: string }) {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(reviews).values(data);
+}
+
+export async function getProductAverageRating(productId: number) {
+  const db = await getDb();
+  if (!db) return { average: 0, count: 0 };
+  const result = await db.select({
+    avg: sql<number>`AVG(rating)`,
+    count: sql<number>`COUNT(*)`,
+  }).from(reviews).where(eq(reviews.productId, productId));
+  return { average: result[0]?.avg || 0, count: result[0]?.count || 0 };
+}
+
+export async function hasUserReviewed(userId: number, productId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  const result = await db.select().from(reviews).where(and(eq(reviews.userId, userId), eq(reviews.productId, productId))).limit(1);
+  return result.length > 0;
+}
+
+// ===== NEWSLETTER =====
+export async function subscribeNewsletter(email: string) {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    await db.insert(newsletterSubscribers).values({ email });
+    return true;
+  } catch (err: any) {
+    // Duplicate email
+    if (err?.code === "ER_DUP_ENTRY") return false;
+    throw err;
+  }
 }

@@ -186,6 +186,47 @@ Seja profissional, amigável e direto. Responda sempre em português brasileiro.
     }),
   }),
 
+  // ===== REVIEWS =====
+  reviews: router({
+    byProduct: publicProcedure.input(z.object({ productId: z.number() })).query(async ({ input }) => {
+      return db.getProductReviews(input.productId);
+    }),
+    rating: publicProcedure.input(z.object({ productId: z.number() })).query(async ({ input }) => {
+      return db.getProductAverageRating(input.productId);
+    }),
+    canReview: protectedProcedure.input(z.object({ productId: z.number() })).query(async ({ ctx, input }) => {
+      const hasReviewed = await db.hasUserReviewed(ctx.user.id, input.productId);
+      return { canReview: !hasReviewed };
+    }),
+    create: protectedProcedure.input(z.object({
+      productId: z.number(),
+      rating: z.number().min(1).max(5),
+      comment: z.string().optional(),
+    })).mutation(async ({ ctx, input }) => {
+      const hasReviewed = await db.hasUserReviewed(ctx.user.id, input.productId);
+      if (hasReviewed) throw new Error("Você já avaliou este produto.");
+      await db.createReview({
+        userId: ctx.user.id,
+        productId: input.productId,
+        rating: input.rating,
+        comment: input.comment,
+        userName: ctx.user.name ?? undefined,
+      });
+      return { success: true };
+    }),
+  }),
+
+  // ===== NEWSLETTER =====
+  newsletter: router({
+    subscribe: publicProcedure.input(z.object({
+      email: z.string().email(),
+    })).mutation(async ({ input }) => {
+      const success = await db.subscribeNewsletter(input.email);
+      if (!success) return { success: true, message: "Você já está inscrito!" };
+      return { success: true, message: "Inscrito com sucesso!" };
+    }),
+  }),
+
   // ===== ADMIN =====
   admin: router({
     products: router({

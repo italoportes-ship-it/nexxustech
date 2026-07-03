@@ -60,3 +60,6 @@
 - [x] Skeleton loading nos cards Bento Grid durante carregamento
 - [x] Toast de boas-vindas personalizado após login
 - [x] Página de FAQ com accordion animado
+- [x] Sistema de avaliação de produtos (estrelas + comentário)
+- [x] Comparador de produtos lado a lado
+- [x] Newsletter no footer com captura de e-mail
