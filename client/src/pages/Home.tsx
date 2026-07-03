@@ -6,6 +6,7 @@ import { Shield, Code, Palette, BarChart3, ArrowRight, Zap, Globe, Award } from 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import AnimatedCounter from "@/components/AnimatedCounter";
+import Testimonials from "@/components/Testimonials";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   Shield: <Shield className="w-6 h-6" />,
@@ -61,14 +62,14 @@ export default function Home() {
   const heroY = useTransform(scrollYProgress, [0, 0.5], [0, 60]);
 
   return (
-    <div className="min-h-screen bg-[#1D1D1F]">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
       {/* Hero Section - Apple Style with parallax */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden pt-14">
         {/* Background gradient */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#1D1D1F] to-[#1D1D1F]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background dark:from-[#0a0a0a] dark:via-[#1D1D1F] dark:to-[#1D1D1F]" />
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#0071E3]/10 rounded-full blur-[120px]" />
           <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#0071E3]/5 rounded-full blur-[80px]" />
         </div>
@@ -95,7 +96,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 0.8, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
-              className="text-display text-white mb-6"
+              className="text-display text-foreground mb-6"
             >
               Softwares e cursos
               <br />
@@ -107,7 +108,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.5 }}
-              className="text-body-large text-white/60 max-w-2xl mx-auto mb-10"
+              className="text-body-large text-muted-foreground max-w-2xl mx-auto mb-10"
             >
               Descubra as melhores soluções em infraestrutura, desenvolvimento, design e análise de dados. Para profissionais e empresas que exigem excelência.
             </motion.p>
@@ -133,7 +134,7 @@ export default function Home() {
       </section>
 
       {/* Categories - Bento Grid with staggered scroll animations */}
-      <section className="py-24 bg-[#0a0a0a]">
+      <section className="py-24 bg-secondary">
         <div className="container">
           <motion.div
             variants={fadeInUp}
@@ -143,10 +144,10 @@ export default function Home() {
             transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
             className="text-center mb-16"
           >
-            <h2 className="text-headline text-white mb-4">
+            <h2 className="text-headline text-foreground mb-4">
               Nossas Categorias
             </h2>
-            <p className="text-body-large text-white/50 max-w-xl mx-auto">
+            <p className="text-body-large text-muted-foreground max-w-xl mx-auto">
               Soluções organizadas para atender cada necessidade do seu negócio.
             </p>
           </motion.div>
@@ -170,10 +171,10 @@ export default function Home() {
                         {categoryIcons[cat.icon || "Shield"]}
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-[#0071E3] transition-colors">
+                        <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-[#0071E3] transition-colors">
                           {cat.name}
                         </h3>
-                        <p className="text-sm text-white/50 leading-relaxed">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
                           {cat.description}
                         </p>
                         <span className="inline-flex items-center gap-1 text-sm text-[#0071E3] mt-4 font-medium">
@@ -190,7 +191,7 @@ export default function Home() {
       </section>
 
       {/* Featured Products with staggered scroll animations */}
-      <section className="py-24 bg-[#1D1D1F]">
+      <section className="py-24 bg-background">
         <div className="container">
           <motion.div
             variants={fadeInUp}
@@ -200,10 +201,10 @@ export default function Home() {
             transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
             className="text-center mb-16"
           >
-            <h2 className="text-headline text-white mb-4">
+            <h2 className="text-headline text-foreground mb-4">
               Soluções em Destaque
             </h2>
-            <p className="text-body-large text-white/50 max-w-xl mx-auto">
+            <p className="text-body-large text-muted-foreground max-w-xl mx-auto">
               Os softwares mais procurados por profissionais e empresas.
             </p>
           </motion.div>
@@ -233,15 +234,15 @@ export default function Home() {
                           {product.type === "course" ? "Curso" : "Software"}
                         </span>
                       </div>
-                      <h3 className="text-base font-semibold text-white mb-2 group-hover:text-[#0071E3] transition-colors">
+                      <h3 className="text-base font-semibold text-foreground mb-2 group-hover:text-[#0071E3] transition-colors">
                         {product.name}
                       </h3>
-                      <p className="text-sm text-white/50 leading-relaxed line-clamp-2">
+                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
                         {product.shortDescription}
                       </p>
                     </div>
                     <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/5">
-                      <span className="text-lg font-bold text-white">
+                      <span className="text-lg font-bold text-foreground">
                         R$ {parseFloat(product.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                       </span>
                       <span className="text-sm text-[#0071E3] font-medium flex items-center gap-1">
@@ -272,7 +273,7 @@ export default function Home() {
       </section>
 
       {/* Trust Section with staggered animations */}
-      <section className="py-24 bg-[#0a0a0a]">
+      <section className="py-24 bg-secondary">
         <div className="container">
           <motion.div
             variants={fadeInUp}
@@ -282,7 +283,7 @@ export default function Home() {
             transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
             className="text-center mb-16"
           >
-            <h2 className="text-headline text-white mb-4">
+            <h2 className="text-headline text-foreground mb-4">
               Por que escolher a NexxusTECH?
             </h2>
           </motion.div>
@@ -320,8 +321,8 @@ export default function Home() {
                 <div className="w-14 h-14 rounded-2xl bg-[#0071E3]/10 flex items-center justify-center text-[#0071E3] mx-auto mb-5">
                   {item.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
-                <p className="text-sm text-white/50 leading-relaxed">{item.description}</p>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -329,7 +330,7 @@ export default function Home() {
       </section>
 
       {/* Stats Section with animated counters */}
-      <section className="py-20 bg-[#1D1D1F] border-y border-white/5">
+      <section className="py-20 bg-background border-y border-border">
         <div className="container">
           <motion.div
             variants={staggerContainer}
@@ -350,18 +351,21 @@ export default function Home() {
                 transition={{ duration: 0.5 }}
                 className="text-center"
               >
-                <p className="text-3xl md:text-4xl font-bold text-white mb-1">
+                <p className="text-3xl md:text-4xl font-bold text-foreground mb-1">
                   <AnimatedCounter end={stat.end} duration={2000} suffix={stat.suffix} />
                 </p>
-                <p className="text-sm text-white/40">{stat.label}</p>
+                <p className="text-sm text-muted-foreground">{stat.label}</p>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
+      {/* Testimonials */}
+      <Testimonials />
+
       {/* CTA Section */}
-      <section className="py-24 bg-[#1D1D1F] relative overflow-hidden">
+      <section className="py-24 bg-background relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#0071E3]/5 rounded-full blur-[100px]" />
         </div>
@@ -373,10 +377,10 @@ export default function Home() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
           >
-            <h2 className="text-headline text-white mb-4">
+            <h2 className="text-headline text-foreground mb-4">
               Pronto para transformar seu negócio?
             </h2>
-            <p className="text-body-large text-white/50 max-w-xl mx-auto mb-10">
+            <p className="text-body-large text-muted-foreground max-w-xl mx-auto mb-10">
               Converse com nossa equipe e descubra as melhores soluções para sua empresa.
             </p>
             <motion.div

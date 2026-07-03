@@ -48,11 +48,11 @@ export default function Cursos() {
   const courses = coursesQuery.data || [];
 
   return (
-    <div className="min-h-screen bg-[#1D1D1F]">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
       {/* Header */}
-      <section className="pt-32 pb-16 bg-[#0a0a0a]">
+      <section className="pt-32 pb-16 bg-secondary">
         <div className="container text-center">
           <motion.div
             variants={fadeInUp}
@@ -60,8 +60,8 @@ export default function Cursos() {
             animate="visible"
             transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
           >
-            <h1 className="text-headline text-white mb-4">Cursos Digitais</h1>
-            <p className="text-body-large text-white/50 max-w-2xl mx-auto">
+            <h1 className="text-headline text-foreground mb-4">Cursos Digitais</h1>
+            <p className="text-body-large text-muted-foreground max-w-2xl mx-auto">
               Capacitação profissional com os melhores cursos em tecnologia. Do iniciante ao avançado.
             </p>
           </motion.div>
@@ -69,7 +69,7 @@ export default function Cursos() {
       </section>
 
       {/* Courses Grid */}
-      <section className="py-16 bg-[#1D1D1F]">
+      <section className="py-16 bg-background">
         <div className="container">
           <motion.div
             variants={staggerContainer}
@@ -98,25 +98,25 @@ export default function Cursos() {
                       )}
                     </div>
 
-                    <h3 className="text-lg font-semibold text-white mb-3 group-hover:text-[#0071E3] transition-colors">
+                    <h3 className="text-lg font-semibold text-foreground mb-3 group-hover:text-[#0071E3] transition-colors">
                       {course.name}
                     </h3>
-                    <p className="text-sm text-white/50 leading-relaxed mb-4">
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                       {course.shortDescription}
                     </p>
 
                     {course.features && (
                       <div className="flex flex-wrap gap-1.5 mb-6">
                         {course.features.split(",").map((f, i) => (
-                          <span key={i} className="text-xs px-2.5 py-1 rounded-lg bg-white/5 text-white/40">
+                          <span key={i} className="text-xs px-2.5 py-1 rounded-lg bg-accent text-muted-foreground">
                             {f.trim()}
                           </span>
                         ))}
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                      <span className="text-xl font-bold text-white">
+                    <div className="flex items-center justify-between pt-4 border-t border-border">
+                      <span className="text-xl font-bold text-foreground">
                         R$ {parseFloat(course.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                       </span>
                       <span className="apple-btn apple-btn-primary text-sm py-2 px-4">
@@ -131,7 +131,7 @@ export default function Cursos() {
 
           {courses.length === 0 && !coursesQuery.isLoading && (
             <div className="text-center py-20">
-              <p className="text-white/40 text-lg">Nenhum curso disponível no momento.</p>
+              <p className="text-muted-foreground text-lg">Nenhum curso disponível no momento.</p>
             </div>
           )}
         </div>

@@ -53,7 +53,7 @@ export default function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1D1D1F]">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
       <section className="pt-32 pb-24">
@@ -63,12 +63,12 @@ export default function Cart() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-headline text-white mb-8">Carrinho</h1>
+            <h1 className="text-headline text-foreground mb-8">Carrinho</h1>
 
             {items.length === 0 ? (
               <div className="text-center py-20">
-                <ShoppingCart className="w-16 h-16 text-white/20 mx-auto mb-6" />
-                <p className="text-lg text-white/40 mb-6">Seu carrinho está vazio.</p>
+                <ShoppingCart className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
+                <p className="text-lg text-muted-foreground mb-6">Seu carrinho está vazio.</p>
                 <Link href="/softwares">
                   <span className="apple-btn apple-btn-primary">Explorar Produtos</span>
                 </Link>
@@ -90,35 +90,35 @@ export default function Cart() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <Link href={`/produto/${item.product.slug}`}>
-                          <h3 className="text-sm font-semibold text-white hover:text-[#0071E3] transition-colors truncate">
+                          <h3 className="text-sm font-semibold text-foreground hover:text-[#0071E3] transition-colors truncate">
                             {item.product.name}
                           </h3>
                         </Link>
-                        <p className="text-xs text-white/40 mt-0.5">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {item.product.type === "course" ? "Curso Digital" : "Software"}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleQuantity(item.productId, item.quantity - 1)}
-                          className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-white/60 hover:bg-white/10"
+                          className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center text-muted-foreground hover:bg-white/10"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="text-sm text-white w-6 text-center">{item.quantity}</span>
+                        <span className="text-sm text-foreground w-6 text-center">{item.quantity}</span>
                         <button
                           onClick={() => handleQuantity(item.productId, item.quantity + 1)}
-                          className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-white/60 hover:bg-white/10"
+                          className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center text-muted-foreground hover:bg-white/10"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
-                      <span className="text-sm font-semibold text-white w-28 text-right">
+                      <span className="text-sm font-semibold text-foreground w-28 text-right">
                         R$ {(parseFloat(item.product.price) * item.quantity).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                       </span>
                       <button
                         onClick={() => handleRemove(item.productId)}
-                        className="p-2 text-white/30 hover:text-red-400 transition-colors"
+                        className="p-2 text-muted-foreground hover:text-red-400 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -129,21 +129,21 @@ export default function Cart() {
                 {/* Summary */}
                 <div className="lg:col-span-1">
                   <div className="bento-card !p-6 sticky top-24">
-                    <h3 className="text-base font-semibold text-white mb-6">Resumo do Pedido</h3>
+                    <h3 className="text-base font-semibold text-foreground mb-6">Resumo do Pedido</h3>
                     <div className="space-y-3 mb-6">
                       <div className="flex justify-between text-sm">
-                        <span className="text-white/50">Subtotal ({items.length} {items.length === 1 ? "item" : "itens"})</span>
-                        <span className="text-white">R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+                        <span className="text-muted-foreground">Subtotal ({items.length} {items.length === 1 ? "item" : "itens"})</span>
+                        <span className="text-foreground">R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-white/50">Desconto</span>
+                        <span className="text-muted-foreground">Desconto</span>
                         <span className="text-green-400">-R$ 0,00</span>
                       </div>
                     </div>
-                    <div className="border-t border-white/5 pt-4 mb-6">
+                    <div className="border-t border-border pt-4 mb-6">
                       <div className="flex justify-between">
-                        <span className="text-base font-semibold text-white">Total</span>
-                        <span className="text-xl font-bold text-white">
+                        <span className="text-base font-semibold text-foreground">Total</span>
+                        <span className="text-xl font-bold text-foreground">
                           R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                         </span>
                       </div>

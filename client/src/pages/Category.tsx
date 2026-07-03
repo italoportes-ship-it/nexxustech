@@ -42,11 +42,11 @@ export default function Category() {
   );
 
   return (
-    <div className="min-h-screen bg-[#1D1D1F]">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
       {/* Header */}
-      <section className="pt-32 pb-16 bg-[#0a0a0a]">
+      <section className="pt-32 pb-16 bg-secondary">
         <div className="container">
           <Link href="/softwares" className="inline-flex items-center gap-2 text-sm text-[#0071E3] mb-6 hover:underline">
             <ArrowLeft className="w-4 h-4" /> Voltar ao catálogo
@@ -57,8 +57,8 @@ export default function Category() {
             animate="visible"
             transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
           >
-            <h1 className="text-headline text-white mb-4">{category?.name || "Categoria"}</h1>
-            <p className="text-body-large text-white/50 max-w-2xl">
+            <h1 className="text-headline text-foreground mb-4">{category?.name || "Categoria"}</h1>
+            <p className="text-body-large text-muted-foreground max-w-2xl">
               {category?.description}
             </p>
           </motion.div>
@@ -66,7 +66,7 @@ export default function Category() {
       </section>
 
       {/* Products */}
-      <section className="py-16 bg-[#1D1D1F]">
+      <section className="py-16 bg-background">
         <div className="container">
           <motion.div
             variants={staggerContainer}
@@ -90,24 +90,24 @@ export default function Category() {
                       }`}>
                         {product.type === "course" ? "Curso" : "Software"}
                       </span>
-                      <h3 className="text-base font-semibold text-white mb-2 group-hover:text-[#0071E3] transition-colors">
+                      <h3 className="text-base font-semibold text-foreground mb-2 group-hover:text-[#0071E3] transition-colors">
                         {product.name}
                       </h3>
-                      <p className="text-sm text-white/50 leading-relaxed line-clamp-3 mb-4">
+                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">
                         {product.shortDescription}
                       </p>
                       {product.features && (
                         <div className="flex flex-wrap gap-1.5">
                           {product.features.split(",").slice(0, 3).map((f, i) => (
-                            <span key={i} className="text-xs px-2 py-1 rounded-lg bg-white/5 text-white/40">
+                            <span key={i} className="text-xs px-2 py-1 rounded-lg bg-accent text-muted-foreground">
                               {f.trim()}
                             </span>
                           ))}
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/5">
-                      <span className="text-lg font-bold text-white">
+                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
+                      <span className="text-lg font-bold text-foreground">
                         R$ {parseFloat(product.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                       </span>
                       <span className="text-sm text-[#0071E3] font-medium flex items-center gap-1">

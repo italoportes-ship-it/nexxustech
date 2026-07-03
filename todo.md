@@ -50,3 +50,6 @@
 - [x] Micro-interações nos botões CTA (scale 0.97 no :active)
 - [x] Animação de contagem progressiva nos números estatísticos
 - [x] Transições suaves entre páginas com AnimatePresence
+- [x] Sistema de busca global com Cmd+K (cmdk)
+- [x] Seção de depoimentos com carrossel automático na landing page
+- [x] Modo claro/escuro com toggle e Design Tokens light

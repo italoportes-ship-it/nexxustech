@@ -23,7 +23,7 @@ export default function Checkout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1D1D1F]">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
       <section className="pt-32 pb-24">
@@ -37,31 +37,31 @@ export default function Checkout() {
               <ArrowLeft className="w-4 h-4" /> Voltar ao carrinho
             </Link>
 
-            <h1 className="text-headline text-white mb-2">Checkout</h1>
-            <p className="text-sm text-white/50 mb-10">Pedido #{orderId}</p>
+            <h1 className="text-headline text-foreground mb-2">Checkout</h1>
+            <p className="text-sm text-muted-foreground mb-10">Pedido #{orderId}</p>
 
             {/* Order Summary */}
             <div className="bento-card !p-6 mb-6">
-              <h3 className="text-base font-semibold text-white mb-5 flex items-center gap-2">
+              <h3 className="text-base font-semibold text-foreground mb-5 flex items-center gap-2">
                 <Package className="w-5 h-5 text-[#0071E3]" />
                 Itens do Pedido
               </h3>
               <div className="space-y-4">
                 {items.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
+                  <div key={item.id} className="flex items-center justify-between py-3 border-b border-border last:border-0">
                     <div>
-                      <p className="text-sm font-medium text-white">{item.productName}</p>
-                      <p className="text-xs text-white/40">Qtd: {item.quantity}</p>
+                      <p className="text-sm font-medium text-foreground">{item.productName}</p>
+                      <p className="text-xs text-muted-foreground">Qtd: {item.quantity}</p>
                     </div>
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-semibold text-foreground">
                       R$ {(parseFloat(item.price) * item.quantity).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
                 ))}
               </div>
-              <div className="mt-5 pt-5 border-t border-white/10 flex justify-between items-center">
-                <span className="text-base font-semibold text-white">Total</span>
-                <span className="text-2xl font-bold text-white">
+              <div className="mt-5 pt-5 border-t border-border flex justify-between items-center">
+                <span className="text-base font-semibold text-foreground">Total</span>
+                <span className="text-2xl font-bold text-foreground">
                   R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -69,11 +69,11 @@ export default function Checkout() {
 
             {/* Payment */}
             <div className="bento-card !p-6">
-              <h3 className="text-base font-semibold text-white mb-5 flex items-center gap-2">
+              <h3 className="text-base font-semibold text-foreground mb-5 flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-[#0071E3]" />
                 Pagamento
               </h3>
-              <p className="text-sm text-white/50 mb-6">
+              <p className="text-sm text-muted-foreground mb-6">
                 Processamento seguro via Stripe. Aceitamos cartão de crédito, débito e outros métodos.
               </p>
               <button
@@ -83,7 +83,7 @@ export default function Checkout() {
                 <CreditCard className="w-5 h-5 mr-2" />
                 Pagar R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
               </button>
-              <p className="text-xs text-white/30 text-center mt-4">
+              <p className="text-xs text-muted-foreground text-center mt-4">
                 Pagamento processado com segurança pelo Stripe. Seus dados estão protegidos.
               </p>
             </div>

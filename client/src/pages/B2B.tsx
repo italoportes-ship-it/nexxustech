@@ -64,11 +64,11 @@ export default function B2B() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#1D1D1F]">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
       {/* Hero */}
-      <section className="pt-32 pb-20 bg-[#0a0a0a] relative overflow-hidden">
+      <section className="pt-32 pb-20 bg-secondary relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-[#0071E3]/5 rounded-full blur-[100px]" />
         </div>
@@ -91,7 +91,7 @@ export default function B2B() {
               initial={{ opacity: 0, y: 25, filter: "blur(8px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              className="text-headline text-white mb-6"
+              className="text-headline text-foreground mb-6"
             >
               Tecnologia sob medida
               <br />para sua empresa.
@@ -100,7 +100,7 @@ export default function B2B() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-body-large text-white/50 max-w-2xl"
+              className="text-body-large text-muted-foreground max-w-2xl"
             >
               Pacotes corporativos com licenciamento em volume, suporte dedicado e condições especiais para equipes de todos os tamanhos.
             </motion.p>
@@ -109,7 +109,7 @@ export default function B2B() {
       </section>
 
       {/* Benefits */}
-      <section className="py-20 bg-[#1D1D1F]">
+      <section className="py-20 bg-background">
         <div className="container">
           <motion.div
             variants={staggerContainer}
@@ -127,8 +127,8 @@ export default function B2B() {
                 <div className="w-12 h-12 rounded-2xl bg-[#0071E3]/10 flex items-center justify-center text-[#0071E3] mx-auto mb-4">
                   {item.icon}
                 </div>
-                <h3 className="text-sm font-semibold text-white mb-2">{item.title}</h3>
-                <p className="text-xs text-white/50">{item.desc}</p>
+                <h3 className="text-sm font-semibold text-foreground mb-2">{item.title}</h3>
+                <p className="text-xs text-muted-foreground">{item.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -136,7 +136,7 @@ export default function B2B() {
       </section>
 
       {/* Contact Form */}
-      <section className="py-20 bg-[#0a0a0a]">
+      <section className="py-20 bg-secondary">
         <div className="container">
           <div className="max-w-2xl mx-auto">
             <motion.div
@@ -147,8 +147,8 @@ export default function B2B() {
               transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
               className="text-center mb-12"
             >
-              <h2 className="text-title text-white mb-4">Solicitar Orçamento</h2>
-              <p className="text-sm text-white/50">
+              <h2 className="text-title text-foreground mb-4">Solicitar Orçamento</h2>
+              <p className="text-sm text-muted-foreground">
                 Preencha o formulário e nossa equipe comercial entrará em contato em até 24h.
               </p>
             </motion.div>
@@ -163,24 +163,24 @@ export default function B2B() {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-medium text-white/60 mb-2">Nome da Empresa *</label>
+                  <label className="block text-xs font-medium text-muted-foreground mb-2">Nome da Empresa *</label>
                   <input
                     type="text"
                     required
                     value={form.companyName}
                     onChange={(e) => setForm({ ...form, companyName: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#0071E3] transition-colors"
+                    className="w-full px-4 py-3 bg-accent border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#0071E3] transition-colors"
                     placeholder="Sua empresa"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-white/60 mb-2">Nome do Contato *</label>
+                  <label className="block text-xs font-medium text-muted-foreground mb-2">Nome do Contato *</label>
                   <input
                     type="text"
                     required
                     value={form.contactName}
                     onChange={(e) => setForm({ ...form, contactName: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#0071E3] transition-colors"
+                    className="w-full px-4 py-3 bg-accent border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#0071E3] transition-colors"
                     placeholder="Seu nome"
                   />
                 </div>
@@ -188,51 +188,51 @@ export default function B2B() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-medium text-white/60 mb-2">E-mail Corporativo *</label>
+                  <label className="block text-xs font-medium text-muted-foreground mb-2">E-mail Corporativo *</label>
                   <input
                     type="email"
                     required
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#0071E3] transition-colors"
+                    className="w-full px-4 py-3 bg-accent border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#0071E3] transition-colors"
                     placeholder="email@empresa.com"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-white/60 mb-2">Telefone</label>
+                  <label className="block text-xs font-medium text-muted-foreground mb-2">Telefone</label>
                   <input
                     type="tel"
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#0071E3] transition-colors"
+                    className="w-full px-4 py-3 bg-accent border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#0071E3] transition-colors"
                     placeholder="(11) 99999-9999"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-white/60 mb-2">Número de Funcionários</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-2">Número de Funcionários</label>
                 <select
                   value={form.employees}
                   onChange={(e) => setForm({ ...form, employees: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-[#0071E3] transition-colors"
+                  className="w-full px-4 py-3 bg-accent border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-[#0071E3] transition-colors"
                 >
-                  <option value="" className="bg-[#1D1D1F]">Selecione</option>
-                  <option value="1-10" className="bg-[#1D1D1F]">1 - 10</option>
-                  <option value="11-50" className="bg-[#1D1D1F]">11 - 50</option>
-                  <option value="51-200" className="bg-[#1D1D1F]">51 - 200</option>
-                  <option value="201-500" className="bg-[#1D1D1F]">201 - 500</option>
-                  <option value="500+" className="bg-[#1D1D1F]">500+</option>
+                  <option value="" className="bg-background">Selecione</option>
+                  <option value="1-10" className="bg-background">1 - 10</option>
+                  <option value="11-50" className="bg-background">11 - 50</option>
+                  <option value="51-200" className="bg-background">51 - 200</option>
+                  <option value="201-500" className="bg-background">201 - 500</option>
+                  <option value="500+" className="bg-background">500+</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-white/60 mb-2">Mensagem</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-2">Mensagem</label>
                 <textarea
                   rows={4}
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#0071E3] transition-colors resize-none"
+                  className="w-full px-4 py-3 bg-accent border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#0071E3] transition-colors resize-none"
                   placeholder="Descreva suas necessidades..."
                 />
               </div>

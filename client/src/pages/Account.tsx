@@ -20,7 +20,7 @@ export default function Account() {
   const orders = ordersQuery.data || [];
 
   return (
-    <div className="min-h-screen bg-[#1D1D1F]">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
       <section className="pt-32 pb-24">
@@ -37,13 +37,13 @@ export default function Account() {
                   <User className="w-7 h-7 text-[#0071E3]" />
                 </div>
                 <div>
-                  <h1 className="text-title text-white">{user?.name || "Minha Conta"}</h1>
-                  <p className="text-sm text-white/50">{user?.email}</p>
+                  <h1 className="text-title text-foreground">{user?.name || "Minha Conta"}</h1>
+                  <p className="text-sm text-muted-foreground">{user?.email}</p>
                 </div>
               </div>
               <button
                 onClick={() => logout()}
-                className="flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors"
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <LogOut className="w-4 h-4" /> Sair
               </button>
@@ -52,19 +52,19 @@ export default function Account() {
             {/* Quick Stats with animated counters */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
               <div className="bento-card !p-5 text-center">
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-foreground">
                   <AnimatedCounter end={orders.length} duration={1500} />
                 </p>
-                <p className="text-xs text-white/50 mt-1">Pedidos Realizados</p>
+                <p className="text-xs text-muted-foreground mt-1">Pedidos Realizados</p>
               </div>
               <div className="bento-card !p-5 text-center">
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-foreground">
                   <AnimatedCounter end={orders.filter(o => o.status === "paid").length} duration={1500} />
                 </p>
-                <p className="text-xs text-white/50 mt-1">Produtos Ativos</p>
+                <p className="text-xs text-muted-foreground mt-1">Produtos Ativos</p>
               </div>
               <div className="bento-card !p-5 text-center">
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-foreground">
                   <AnimatedCounter
                     end={orders.filter(o => o.status === "paid").reduce((s, o) => s + parseFloat(o.totalAmount), 0)}
                     duration={2000}
@@ -72,20 +72,20 @@ export default function Account() {
                     prefix="R$ "
                   />
                 </p>
-                <p className="text-xs text-white/50 mt-1">Total Investido</p>
+                <p className="text-xs text-muted-foreground mt-1">Total Investido</p>
               </div>
             </div>
 
             {/* Purchased Products */}
             {orders.filter(o => o.status === "paid").length > 0 && (
               <div className="mb-12">
-                <h2 className="text-lg font-semibold text-white mb-6">Meus Produtos</h2>
+                <h2 className="text-lg font-semibold text-foreground mb-6">Meus Produtos</h2>
                 <div className="bento-card !p-5">
-                  <p className="text-sm text-white/60 mb-3">Você tem acesso aos produtos dos pedidos pagos abaixo. Clique em um pedido para ver os itens.</p>
+                  <p className="text-sm text-muted-foreground mb-3">Você tem acesso aos produtos dos pedidos pagos abaixo. Clique em um pedido para ver os itens.</p>
                   <div className="space-y-2">
                     {orders.filter(o => o.status === "paid").map(order => (
-                      <div key={order.id} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
-                        <span className="text-sm text-white">Pedido #{order.id}</span>
+                      <div key={order.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                        <span className="text-sm text-foreground">Pedido #{order.id}</span>
                         <span className="text-xs text-green-400">Acesso Liberado</span>
                       </div>
                     ))}
@@ -95,11 +95,11 @@ export default function Account() {
             )}
 
             {/* Orders */}
-            <h2 className="text-lg font-semibold text-white mb-6">Histórico de Pedidos</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-6">Histórico de Pedidos</h2>
             {orders.length === 0 ? (
               <div className="text-center py-16 bento-card">
-                <ShoppingCart className="w-12 h-12 text-white/20 mx-auto mb-4" />
-                <p className="text-white/40 mb-4">Você ainda não realizou nenhum pedido.</p>
+                <ShoppingCart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4">Você ainda não realizou nenhum pedido.</p>
                 <Link href="/softwares">
                   <span className="apple-btn apple-btn-primary text-sm">Explorar Produtos</span>
                 </Link>
@@ -118,12 +118,12 @@ export default function Account() {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-                            <Package className="w-5 h-5 text-white/40" />
+                          <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
+                            <Package className="w-5 h-5 text-muted-foreground" />
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-white">Pedido #{order.id}</p>
-                            <p className="text-xs text-white/40">
+                            <p className="text-sm font-medium text-foreground">Pedido #{order.id}</p>
+                            <p className="text-xs text-muted-foreground">
                               {new Date(order.createdAt).toLocaleDateString("pt-BR", {
                                 day: "2-digit",
                                 month: "long",
@@ -136,7 +136,7 @@ export default function Account() {
                           <span className={`flex items-center gap-1.5 text-xs font-medium ${status.color}`}>
                             {status.icon} {status.label}
                           </span>
-                          <span className="text-sm font-semibold text-white">
+                          <span className="text-sm font-semibold text-foreground">
                             R$ {parseFloat(order.totalAmount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                           </span>
                         </div>
