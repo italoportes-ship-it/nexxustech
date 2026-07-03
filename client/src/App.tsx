@@ -6,6 +6,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { AnimatePresence } from "framer-motion";
 import PageTransition from "./components/PageTransition";
 import ChatWidget from "./components/ChatWidget";
+import WelcomeToast from "./components/WelcomeToast";
 import { lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -20,6 +21,7 @@ const Cart = lazy(() => import("./pages/Cart"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const Account = lazy(() => import("./pages/Account"));
 const Admin = lazy(() => import("./pages/Admin"));
+const FAQ = lazy(() => import("./pages/FAQ"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function PageLoader() {
@@ -51,6 +53,7 @@ function Router() {
             <Route path="/checkout/:orderId" component={Checkout} />
             <Route path="/conta" component={Account} />
             <Route path="/admin" component={Admin} />
+            <Route path="/faq" component={FAQ} />
             <Route path="/404" component={NotFound} />
             <Route component={NotFound} />
           </Switch>
@@ -68,6 +71,7 @@ function App() {
           <Toaster />
           <Router />
           <ChatWidget />
+          <WelcomeToast />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

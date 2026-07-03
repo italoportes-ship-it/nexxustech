@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import PullToRefresh from "@/components/PullToRefresh";
+import { CourseCardSkeleton } from "@/components/ProductCardSkeleton";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
 import { ArrowRight, BookOpen, Clock, Signal } from "lucide-react";
@@ -76,6 +77,11 @@ export default function Cursos() {
       <PullToRefresh onRefresh={async () => { await coursesQuery.refetch(); }}>
       <section className="py-10 md:py-16 bg-background">
         <div className="container">
+          {coursesQuery.isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CourseCardSkeleton count={4} />
+            </div>
+          ) : (
           <motion.div
             variants={staggerContainer}
             initial="hidden"
@@ -133,6 +139,7 @@ export default function Cursos() {
               </motion.div>
             ))}
           </motion.div>
+          )}
 
           {courses.length === 0 && !coursesQuery.isLoading && (
             <div className="text-center py-20">

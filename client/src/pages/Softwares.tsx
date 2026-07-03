@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import PullToRefresh from "@/components/PullToRefresh";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
 import { ArrowRight, Shield, Code, Palette, BarChart3 } from "lucide-react";
@@ -118,6 +119,11 @@ export default function Softwares() {
       <PullToRefresh onRefresh={async () => { await productsQuery.refetch(); }}>
       <section className="py-10 md:py-16 bg-background">
         <div className="container">
+          {productsQuery.isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <ProductCardSkeleton count={6} />
+            </div>
+          ) : (
           <motion.div
             key={selectedCategory || "all"}
             variants={staggerContainer}
@@ -162,6 +168,7 @@ export default function Softwares() {
               </motion.div>
             ))}
           </motion.div>
+          )}
 
           {filteredProducts.length === 0 && !productsQuery.isLoading && (
             <div className="text-center py-20">

@@ -47,6 +47,9 @@ export default function Footer() {
               <Link href="/conta" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Área do Cliente
               </Link>
+              <Link href="/faq" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">
+                FAQ
+              </Link>
             </div>
           </div>
 

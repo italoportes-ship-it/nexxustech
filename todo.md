@@ -57,3 +57,6 @@
 - [x] Lazy loading nas páginas com React.lazy() e Suspense
 - [x] Breadcrumbs de navegação nas páginas internas
 - [x] Pull-to-refresh no mobile nas listagens de produtos
+- [x] Skeleton loading nos cards Bento Grid durante carregamento
+- [x] Toast de boas-vindas personalizado após login
+- [x] Página de FAQ com accordion animado

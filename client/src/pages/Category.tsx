@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import PullToRefresh from "@/components/PullToRefresh";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { trpc } from "@/lib/trpc";
 import { Link, useParams } from "wouter";
 import { ArrowRight } from "lucide-react";
@@ -72,6 +73,11 @@ export default function Category() {
       <PullToRefresh onRefresh={async () => { await productsQuery.refetch(); }}>
       <section className="py-10 md:py-16 bg-background">
         <div className="container">
+          {productsQuery.isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <ProductCardSkeleton count={6} />
+            </div>
+          ) : (
           <motion.div
             variants={staggerContainer}
             initial="hidden"
@@ -123,6 +129,7 @@ export default function Category() {
               </motion.div>
             ))}
           </motion.div>
+          )}
         </div>
       </section>
       </PullToRefresh>
