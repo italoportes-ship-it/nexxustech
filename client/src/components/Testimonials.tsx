@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 
 const testimonials = [
@@ -68,17 +68,8 @@ export default function Testimonials() {
   const prev = () => goTo((currentIndex - 1 + testimonials.length) % testimonials.length);
   const next = () => goTo((currentIndex + 1) % testimonials.length);
 
-  // Show 3 testimonials at a time on desktop
-  const getVisibleTestimonials = () => {
-    const items = [];
-    for (let i = 0; i < 3; i++) {
-      items.push(testimonials[(currentIndex + i) % testimonials.length]);
-    }
-    return items;
-  };
-
   return (
-    <section className="py-24 bg-background">
+    <section className="py-16 md:py-24 bg-background">
       <div className="container">
         <motion.div
           variants={fadeInUp}
@@ -86,7 +77,7 @@ export default function Testimonials() {
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
-          className="text-center mb-16"
+          className="text-center mb-10 md:mb-16"
         >
           <h2 className="text-headline text-foreground mb-4">
             O que nossos clientes dizem
@@ -96,69 +87,101 @@ export default function Testimonials() {
           </p>
         </motion.div>
 
-        {/* Carousel */}
+        {/* Carousel - single card on mobile, 3 on desktop */}
         <div className="relative">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {getVisibleTestimonials().map((testimonial, index) => (
+          {/* Mobile: single card */}
+          <div className="md:hidden">
+            <AnimatePresence mode="wait">
               <motion.div
-                key={`${currentIndex}-${index}`}
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1, ease: [0.23, 1, 0.32, 1] }}
+                key={currentIndex}
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
                 className="bento-card !p-6"
               >
-                {/* Stars */}
                 <div className="flex gap-1 mb-4">
-                  {Array.from({ length: testimonial.rating }).map((_, i) => (
+                  {Array.from({ length: testimonials[currentIndex].rating }).map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-[#0071E3] text-[#0071E3]" />
                   ))}
                 </div>
-
-                {/* Content */}
                 <p className="text-sm text-foreground/70 leading-relaxed mb-6">
-                  "{testimonial.content}"
+                  "{testimonials[currentIndex].content}"
                 </p>
-
-                {/* Author */}
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-[#0071E3]/10 flex items-center justify-center text-[#0071E3] text-sm font-semibold">
-                    {testimonial.name.charAt(0)}
+                    {testimonials[currentIndex].name.charAt(0)}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">{testimonial.name}</p>
-                    <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                    <p className="text-sm font-medium text-foreground">{testimonials[currentIndex].name}</p>
+                    <p className="text-xs text-muted-foreground">{testimonials[currentIndex].role}</p>
                   </div>
                 </div>
               </motion.div>
-            ))}
+            </AnimatePresence>
           </div>
 
-          {/* Navigation */}
-          <div className="flex items-center justify-center gap-4 mt-10">
+          {/* Desktop: 3 cards */}
+          <div className="hidden md:grid md:grid-cols-3 gap-6">
+            {[0, 1, 2].map((offset) => {
+              const idx = (currentIndex + offset) % testimonials.length;
+              const testimonial = testimonials[idx];
+              return (
+                <motion.div
+                  key={`${currentIndex}-${offset}`}
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.5, delay: offset * 0.1, ease: [0.23, 1, 0.32, 1] }}
+                  className="bento-card !p-6"
+                >
+                  <div className="flex gap-1 mb-4">
+                    {Array.from({ length: testimonial.rating }).map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-[#0071E3] text-[#0071E3]" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-foreground/70 leading-relaxed mb-6">
+                    "{testimonial.content}"
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-[#0071E3]/10 flex items-center justify-center text-[#0071E3] text-sm font-semibold">
+                      {testimonial.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{testimonial.name}</p>
+                      <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Navigation dots */}
+          <div className="flex items-center justify-center gap-4 mt-8">
             <button
               onClick={prev}
-              className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-foreground/50 hover:text-foreground hover:border-foreground/30 transition-colors"
+              className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground/50 hover:text-foreground hover:border-foreground/30 transition-colors"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-4 h-4" />
             </button>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               {testimonials.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => goTo(i)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  className={`h-2 rounded-full transition-all duration-300 ${
                     i === currentIndex
-                      ? "bg-[#0071E3] w-6"
-                      : "bg-foreground/20 hover:bg-foreground/40"
+                      ? "bg-[#0071E3] w-5"
+                      : "bg-foreground/20 hover:bg-foreground/40 w-2"
                   }`}
                 />
               ))}
             </div>
             <button
               onClick={next}
-              className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-foreground/50 hover:text-foreground hover:border-foreground/30 transition-colors"
+              className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground/50 hover:text-foreground hover:border-foreground/30 transition-colors"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>

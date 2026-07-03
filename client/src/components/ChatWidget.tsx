@@ -63,7 +63,7 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Toggle Button */}
+      {/* Toggle Button - positioned to avoid overlap with content */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -72,15 +72,15 @@ export default function ChatWidget() {
             exit={{ scale: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-[#0071E3] text-white shadow-lg flex items-center justify-center hover:bg-[#0077ED] transition-colors z-50"
+            className="fixed bottom-5 right-5 md:bottom-6 md:right-6 w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#0071E3] text-white shadow-lg flex items-center justify-center hover:bg-[#0077ED] transition-colors z-50"
             style={{ boxShadow: "0 8px 30px rgba(0, 113, 227, 0.4)" }}
           >
-            <MessageCircle className="w-6 h-6" />
+            <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Chat Window */}
+      {/* Chat Window - full screen on mobile, floating on desktop */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -88,37 +88,37 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-            className="fixed bottom-6 right-6 w-[380px] h-[560px] rounded-3xl border border-white/10 overflow-hidden z-50 flex flex-col"
+            className="fixed inset-4 md:inset-auto md:bottom-6 md:right-6 md:w-[380px] md:h-[560px] rounded-2xl md:rounded-3xl border border-border overflow-hidden z-50 flex flex-col"
             style={{
-              background: "rgba(29, 29, 31, 0.95)",
+              background: "var(--popover)",
               backdropFilter: "saturate(180%) blur(20px)",
-              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
             }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+            <div className="flex items-center justify-between px-4 md:px-5 py-3 md:py-4 border-b border-border flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-[#0071E3] flex items-center justify-center">
                   <MessageCircle className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">Assistente NexxusTECH</p>
+                  <p className="text-sm font-semibold text-foreground">Assistente NexxusTECH</p>
                   <p className="text-xs text-green-400">Online</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-colors"
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+            <div className="flex-1 overflow-y-auto px-4 md:px-5 py-4 space-y-4">
               {messages.length === 0 && (
-                <div className="text-center py-6">
-                  <p className="text-sm text-white/50 mb-4">
+                <div className="text-center py-4 md:py-6">
+                  <p className="text-sm text-muted-foreground mb-4">
                     Olá! Como posso ajudar você hoje?
                   </p>
                   <div className="space-y-2">
@@ -144,7 +144,7 @@ export default function ChatWidget() {
                             }
                           );
                         }}
-                        className="block w-full text-left text-xs px-3 py-2.5 rounded-xl bg-white/5 text-white/60 hover:bg-white/10 hover:text-white transition-colors"
+                        className="block w-full text-left text-xs px-3 py-2.5 rounded-xl bg-accent text-muted-foreground hover:bg-accent/80 hover:text-foreground transition-colors"
                       >
                         {prompt}
                       </button>
@@ -159,10 +159,10 @@ export default function ChatWidget() {
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
+                    className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm ${
                       msg.role === "user"
                         ? "bg-[#0071E3] text-white rounded-br-md"
-                        : "bg-white/5 text-white/80 rounded-bl-md"
+                        : "bg-accent text-foreground/80 rounded-bl-md"
                     }`}
                   >
                     {msg.role === "assistant" ? (
@@ -176,8 +176,8 @@ export default function ChatWidget() {
 
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="px-4 py-3 rounded-2xl rounded-bl-md bg-white/5">
-                    <Loader2 className="w-4 h-4 text-white/40 animate-spin" />
+                  <div className="px-4 py-3 rounded-2xl rounded-bl-md bg-accent">
+                    <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
                   </div>
                 </div>
               )}
@@ -185,7 +185,7 @@ export default function ChatWidget() {
             </div>
 
             {/* Input */}
-            <div className="px-4 py-3 border-t border-white/10">
+            <div className="px-3 md:px-4 py-3 border-t border-border flex-shrink-0">
               <div className="flex items-center gap-2">
                 <input
                   type="text"
@@ -193,12 +193,12 @@ export default function ChatWidget() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Digite sua mensagem..."
-                  className="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#0071E3] transition-colors"
+                  className="flex-1 px-4 py-2.5 bg-accent border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#0071E3] transition-colors"
                 />
                 <button
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
-                  className="w-9 h-9 rounded-xl bg-[#0071E3] flex items-center justify-center text-white disabled:opacity-30 transition-opacity"
+                  className="w-9 h-9 rounded-xl bg-[#0071E3] flex items-center justify-center text-white disabled:opacity-30 transition-opacity flex-shrink-0"
                 >
                   <Send className="w-4 h-4" />
                 </button>

@@ -353,3 +353,28 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: oklch(0.4 0 0 / 50%);
 }
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile-specific fixes */
+@media (max-width: 767px) {
+  .text-display {
+    font-size: 2.25rem;
+  }
+  .text-headline {
+    font-size: 1.5rem;
+  }
+  .text-body-large {
+    font-size: 1rem;
+  }
+  .bento-card {
+    padding: var(--apple-spacing-md);
+  }
+}

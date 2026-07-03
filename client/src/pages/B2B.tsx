@@ -68,7 +68,7 @@ export default function B2B() {
       <Navbar />
 
       {/* Hero */}
-      <section className="pt-32 pb-20 bg-secondary relative overflow-hidden">
+      <section className="pt-24 md:pt-32 pb-12 md:pb-20 bg-secondary relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-[#0071E3]/5 rounded-full blur-[100px]" />
         </div>
@@ -109,14 +109,14 @@ export default function B2B() {
       </section>
 
       {/* Benefits */}
-      <section className="py-20 bg-background">
+      <section className="py-12 md:py-20 bg-background">
         <div className="container">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
           >
             {benefits.map((item, index) => (
               <motion.div
@@ -136,7 +136,7 @@ export default function B2B() {
       </section>
 
       {/* Contact Form */}
-      <section className="py-20 bg-secondary">
+      <section className="py-12 md:py-20 bg-secondary">
         <div className="container">
           <div className="max-w-2xl mx-auto">
             <motion.div

@@ -53,3 +53,4 @@
 - [x] Sistema de busca global com Cmd+K (cmdk)
 - [x] Seção de depoimentos com carrossel automático na landing page
 - [x] Modo claro/escuro com toggle e Design Tokens light
+- [x] Adaptar layout mobile completo e corrigir erros de responsividade

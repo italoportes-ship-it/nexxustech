@@ -52,7 +52,7 @@ export default function Cursos() {
       <Navbar />
 
       {/* Header */}
-      <section className="pt-32 pb-16 bg-secondary">
+      <section className="pt-24 md:pt-32 pb-10 md:pb-16 bg-secondary">
         <div className="container text-center">
           <motion.div
             variants={fadeInUp}
@@ -69,7 +69,7 @@ export default function Cursos() {
       </section>
 
       {/* Courses Grid */}
-      <section className="py-16 bg-background">
+      <section className="py-10 md:py-16 bg-background">
         <div className="container">
           <motion.div
             variants={staggerContainer}

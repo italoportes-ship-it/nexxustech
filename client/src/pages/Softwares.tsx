@@ -57,7 +57,7 @@ export default function Softwares() {
       <Navbar />
 
       {/* Header */}
-      <section className="pt-32 pb-16 bg-secondary">
+      <section className="pt-24 md:pt-32 pb-10 md:pb-16 bg-secondary">
         <div className="container text-center">
           <motion.div
             variants={fadeInUp}
@@ -80,7 +80,7 @@ export default function Softwares() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
-            className="flex items-center gap-3 overflow-x-auto pb-2"
+            className="flex items-center gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1.5 px-1.5"
           >
             <button
               onClick={() => setSelectedCategory(null)}
@@ -111,7 +111,7 @@ export default function Softwares() {
       </section>
 
       {/* Products Grid */}
-      <section className="py-16 bg-background">
+      <section className="py-10 md:py-16 bg-background">
         <div className="container">
           <motion.div
             key={selectedCategory || "all"}

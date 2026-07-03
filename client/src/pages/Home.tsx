@@ -134,7 +134,7 @@ export default function Home() {
       </section>
 
       {/* Categories - Bento Grid with staggered scroll animations */}
-      <section className="py-24 bg-secondary">
+      <section className="py-16 md:py-24 bg-secondary">
         <div className="container">
           <motion.div
             variants={fadeInUp}
@@ -142,7 +142,7 @@ export default function Home() {
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
-            className="text-center mb-16"
+            className="text-center mb-10 md:mb-16"
           >
             <h2 className="text-headline text-foreground mb-4">
               Nossas Categorias
@@ -191,7 +191,7 @@ export default function Home() {
       </section>
 
       {/* Featured Products with staggered scroll animations */}
-      <section className="py-24 bg-background">
+      <section className="py-16 md:py-24 bg-background">
         <div className="container">
           <motion.div
             variants={fadeInUp}
@@ -199,7 +199,7 @@ export default function Home() {
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
-            className="text-center mb-16"
+            className="text-center mb-10 md:mb-16"
           >
             <h2 className="text-headline text-foreground mb-4">
               Soluções em Destaque
@@ -273,7 +273,7 @@ export default function Home() {
       </section>
 
       {/* Trust Section with staggered animations */}
-      <section className="py-24 bg-secondary">
+      <section className="py-16 md:py-24 bg-secondary">
         <div className="container">
           <motion.div
             variants={fadeInUp}
@@ -281,7 +281,7 @@ export default function Home() {
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
-            className="text-center mb-16"
+            className="text-center mb-10 md:mb-16"
           >
             <h2 className="text-headline text-foreground mb-4">
               Por que escolher a NexxusTECH?
@@ -330,7 +330,7 @@ export default function Home() {
       </section>
 
       {/* Stats Section with animated counters */}
-      <section className="py-20 bg-background border-y border-border">
+      <section className="py-12 md:py-20 bg-background border-y border-border">
         <div className="container">
           <motion.div
             variants={staggerContainer}

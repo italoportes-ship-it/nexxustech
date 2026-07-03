@@ -26,7 +26,7 @@ export default function Checkout() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <section className="pt-32 pb-24">
+      <section className="pt-24 md:pt-32 pb-16 md:pb-24">
         <div className="container max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

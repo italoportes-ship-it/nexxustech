@@ -3,10 +3,10 @@ import { Link } from "wouter";
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-secondary">
-      <div className="container py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+      <div className="container py-12 md:py-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="col-span-2 md:col-span-1 space-y-4">
             <span className="text-lg font-bold tracking-tight text-foreground">
               Nexxus<span className="text-[#0071E3]">TECH</span>
             </span>
@@ -63,13 +63,13 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="mt-12 md:mt-16 pt-6 md:pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} NexxusTECH. Todos os direitos reservados.
           </p>
           <div className="flex gap-6">
-            <span className="text-xs text-muted-foreground hover:text-muted-foreground transition-colors cursor-pointer">Termos de Uso</span>
-            <span className="text-xs text-muted-foreground hover:text-muted-foreground transition-colors cursor-pointer">Privacidade</span>
+            <span className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">Termos de Uso</span>
+            <span className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">Privacidade</span>
           </div>
         </div>
       </div>

@@ -46,7 +46,7 @@ export default function Category() {
       <Navbar />
 
       {/* Header */}
-      <section className="pt-32 pb-16 bg-secondary">
+      <section className="pt-24 md:pt-32 pb-10 md:pb-16 bg-secondary">
         <div className="container">
           <Link href="/softwares" className="inline-flex items-center gap-2 text-sm text-[#0071E3] mb-6 hover:underline">
             <ArrowLeft className="w-4 h-4" /> Voltar ao catálogo
@@ -66,7 +66,7 @@ export default function Category() {
       </section>
 
       {/* Products */}
-      <section className="py-16 bg-background">
+      <section className="py-10 md:py-16 bg-background">
         <div className="container">
           <motion.div
             variants={staggerContainer}
