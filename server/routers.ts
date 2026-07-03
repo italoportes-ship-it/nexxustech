@@ -1,28 +1,253 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, adminProcedure, router } from "./_core/trpc";
+import { z } from "zod";
+import * as db from "./db";
+import { invokeLLM } from "./_core/llm";
+import { notifyOwner } from "./_core/notification";
+import { createCheckoutSession } from "./stripe";
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
-      return {
-        success: true,
-      } as const;
+      return { success: true } as const;
     }),
   }),
 
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
+  // ===== CATEGORIES =====
+  categories: router({
+    list: publicProcedure.query(async () => {
+      return db.getAllCategories();
+    }),
+    getBySlug: publicProcedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
+      return db.getCategoryBySlug(input.slug);
+    }),
+  }),
+
+  // ===== PRODUCTS =====
+  products: router({
+    list: publicProcedure.query(async () => {
+      return db.getAllProducts();
+    }),
+    byCategory: publicProcedure.input(z.object({ categoryId: z.number() })).query(async ({ input }) => {
+      return db.getProductsByCategory(input.categoryId);
+    }),
+    byType: publicProcedure.input(z.object({ type: z.enum(["software", "course"]) })).query(async ({ input }) => {
+      return db.getProductsByType(input.type);
+    }),
+    bySlug: publicProcedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
+      return db.getProductBySlug(input.slug);
+    }),
+    byId: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+      return db.getProductById(input.id);
+    }),
+  }),
+
+  // ===== CART =====
+  cart: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return db.getCartItems(ctx.user.id);
+    }),
+    add: protectedProcedure.input(z.object({ productId: z.number() })).mutation(async ({ ctx, input }) => {
+      await db.addToCart(ctx.user.id, input.productId);
+      return { success: true };
+    }),
+    remove: protectedProcedure.input(z.object({ productId: z.number() })).mutation(async ({ ctx, input }) => {
+      await db.removeFromCart(ctx.user.id, input.productId);
+      return { success: true };
+    }),
+    updateQuantity: protectedProcedure.input(z.object({ productId: z.number(), quantity: z.number() })).mutation(async ({ ctx, input }) => {
+      await db.updateCartItemQuantity(ctx.user.id, input.productId, input.quantity);
+      return { success: true };
+    }),
+    clear: protectedProcedure.mutation(async ({ ctx }) => {
+      await db.clearCart(ctx.user.id);
+      return { success: true };
+    }),
+  }),
+
+  // ===== ORDERS =====
+  orders: router({
+    myOrders: protectedProcedure.query(async ({ ctx }) => {
+      return db.getUserOrders(ctx.user.id);
+    }),
+    getItems: protectedProcedure.input(z.object({ orderId: z.number() })).query(async ({ input }) => {
+      return db.getOrderItems(input.orderId);
+    }),
+    create: protectedProcedure.mutation(async ({ ctx }) => {
+      const cartItems = await db.getCartItems(ctx.user.id);
+      if (cartItems.length === 0) {
+        throw new Error("Cart is empty");
+      }
+      const total = cartItems.reduce((sum, item) => sum + parseFloat(item.product.price) * item.quantity, 0);
+      const orderId = await db.createOrder(ctx.user.id, total.toFixed(2), ctx.user.email ?? null);
+      if (!orderId) throw new Error("Failed to create order");
+      for (const item of cartItems) {
+        await db.addOrderItem(orderId, item.productId, item.product.name, item.product.price, item.quantity);
+      }
+      await db.clearCart(ctx.user.id);
+      
+      // Notify owner about new order
+      await notifyOwner({
+        title: `Novo Pedido #${orderId}`,
+        content: `Um novo pedido foi realizado por ${ctx.user.name || ctx.user.email || 'Cliente'}. Total: R$ ${total.toFixed(2)}. Itens: ${cartItems.map(i => i.product.name).join(', ')}.`
+      });
+
+      // Create Stripe checkout session
+      const origin = ctx.req.headers.origin || `${ctx.req.protocol}://${ctx.req.headers.host}`;
+      const stripeItems = cartItems.map(item => ({
+        name: item.product.name,
+        price: parseFloat(item.product.price),
+        quantity: item.quantity,
+      }));
+      
+      let checkoutUrl: string | null = null;
+      try {
+        checkoutUrl = await createCheckoutSession(
+          ctx.user.id,
+          ctx.user.email ?? null,
+          ctx.user.name ?? null,
+          orderId,
+          stripeItems,
+          origin
+        );
+      } catch (err) {
+        console.error("[Stripe] Failed to create checkout session:", err);
+      }
+
+      return { orderId, total: total.toFixed(2), checkoutUrl };
+    }),
+  }),
+
+  // ===== B2B LEADS =====
+  b2b: router({
+    submit: publicProcedure.input(z.object({
+      companyName: z.string().min(1),
+      contactName: z.string().min(1),
+      email: z.string().email(),
+      phone: z.string().optional(),
+      employees: z.string().optional(),
+      message: z.string().optional(),
+    })).mutation(async ({ input }) => {
+      await db.createB2BLead(input);
+      await notifyOwner({
+        title: `Novo Lead B2B: ${input.companyName}`,
+        content: `Empresa: ${input.companyName}\nContato: ${input.contactName}\nEmail: ${input.email}\nTelefone: ${input.phone || 'N/A'}\nFuncionários: ${input.employees || 'N/A'}\nMensagem: ${input.message || 'N/A'}`
+      });
+      return { success: true };
+    }),
+  }),
+
+  // ===== CHATBOT =====
+  chat: router({
+    send: publicProcedure.input(z.object({
+      message: z.string().min(1),
+      sessionId: z.string(),
+      history: z.array(z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string(),
+      })).optional(),
+    })).mutation(async ({ input }) => {
+      const systemPrompt = `Você é o assistente virtual da NexxusTECH, uma plataforma premium de revenda de softwares e cursos digitais. 
+
+Suas responsabilidades:
+- Ajudar clientes a encontrar o software ou curso ideal para suas necessidades
+- Responder dúvidas sobre produtos, preços e funcionalidades
+- Guiar o processo de compra
+- Explicar as categorias disponíveis: Infraestrutura e Segurança Digital, Desenvolvimento e DevOps, Design e Produtividade, Análise de Dados e Estatística
+- Informar sobre opções B2B para empresas (licenciamento em volume, suporte dedicado)
+
+Seja profissional, amigável e direto. Responda sempre em português brasileiro. Mantenha respostas concisas mas informativas.`;
+
+      const messages = [
+        { role: "system" as const, content: systemPrompt },
+        ...(input.history || []).slice(-10).map(m => ({ role: m.role as "user" | "assistant", content: m.content })),
+        { role: "user" as const, content: input.message },
+      ];
+
+      try {
+        const response = await invokeLLM({ messages });
+        const rawContent = response.choices?.[0]?.message?.content;
+        const assistantMessage = typeof rawContent === 'string' ? rawContent : "Desculpe, não consegui processar sua mensagem. Tente novamente.";
+        
+        // Save to DB
+        await db.saveChatMessage(input.sessionId, "user", input.message);
+        await db.saveChatMessage(input.sessionId, "assistant", assistantMessage);
+
+        return { message: assistantMessage };
+      } catch (error) {
+        return { message: "Desculpe, estou com dificuldades técnicas no momento. Por favor, tente novamente em instantes." };
+      }
+    }),
+  }),
+
+  // ===== ADMIN =====
+  admin: router({
+    products: router({
+      list: adminProcedure.query(async () => {
+        return db.getAllProducts();
+      }),
+      create: adminProcedure.input(z.object({
+        name: z.string().min(1),
+        slug: z.string().min(1),
+        description: z.string().optional(),
+        shortDescription: z.string().optional(),
+        price: z.string(),
+        categoryId: z.number(),
+        type: z.enum(["software", "course"]),
+        features: z.string().optional(),
+        level: z.enum(["beginner", "intermediate", "advanced"]).optional(),
+        duration: z.string().optional(),
+        imageUrl: z.string().optional(),
+      })).mutation(async ({ input }) => {
+        await db.createProduct(input as any);
+        return { success: true };
+      }),
+      update: adminProcedure.input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        description: z.string().optional(),
+        shortDescription: z.string().optional(),
+        price: z.string().optional(),
+        categoryId: z.number().optional(),
+        type: z.enum(["software", "course"]).optional(),
+        features: z.string().optional(),
+        level: z.enum(["beginner", "intermediate", "advanced"]).optional(),
+        imageUrl: z.string().optional(),
+      })).mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await db.updateProduct(id, data as any);
+        return { success: true };
+      }),
+      delete: adminProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => {
+        await db.deleteProduct(input.id);
+        return { success: true };
+      }),
+    }),
+    orders: router({
+      list: adminProcedure.query(async () => {
+        return db.getAllOrders();
+      }),
+      getItems: adminProcedure.input(z.object({ orderId: z.number() })).query(async ({ input }) => {
+        return db.getOrderItems(input.orderId);
+      }),
+    }),
+    leads: router({
+      list: adminProcedure.query(async () => {
+        return db.getAllLeads();
+      }),
+    }),
+    users: router({
+      list: adminProcedure.query(async () => {
+        return db.getAllUsers();
+      }),
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

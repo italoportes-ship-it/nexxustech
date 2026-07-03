@@ -1,0 +1,78 @@
+import { Link } from "wouter";
+
+export default function Footer() {
+  return (
+    <footer className="border-t border-white/10 bg-[#0a0a0a]">
+      <div className="container py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+          {/* Brand */}
+          <div className="space-y-4">
+            <span className="text-lg font-bold tracking-tight text-white">
+              Nexxus<span className="text-[#0071E3]">TECH</span>
+            </span>
+            <p className="text-sm text-white/50 leading-relaxed">
+              Plataforma premium de softwares e cursos digitais para empresas e profissionais que buscam excelência.
+            </p>
+          </div>
+
+          {/* Soluções */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-semibold text-white">Soluções</h4>
+            <div className="space-y-2.5">
+              <Link href="/categoria/infraestrutura-seguranca" className="block text-sm text-white/50 hover:text-white transition-colors">
+                Infraestrutura e Segurança
+              </Link>
+              <Link href="/categoria/desenvolvimento-devops" className="block text-sm text-white/50 hover:text-white transition-colors">
+                Desenvolvimento e DevOps
+              </Link>
+              <Link href="/categoria/design-produtividade" className="block text-sm text-white/50 hover:text-white transition-colors">
+                Design e Produtividade
+              </Link>
+              <Link href="/categoria/analise-dados-estatistica" className="block text-sm text-white/50 hover:text-white transition-colors">
+                Análise de Dados
+              </Link>
+            </div>
+          </div>
+
+          {/* Recursos */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-semibold text-white">Recursos</h4>
+            <div className="space-y-2.5">
+              <Link href="/cursos" className="block text-sm text-white/50 hover:text-white transition-colors">
+                Cursos Digitais
+              </Link>
+              <Link href="/b2b" className="block text-sm text-white/50 hover:text-white transition-colors">
+                Soluções Corporativas
+              </Link>
+              <Link href="/conta" className="block text-sm text-white/50 hover:text-white transition-colors">
+                Área do Cliente
+              </Link>
+            </div>
+          </div>
+
+          {/* Contato */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-semibold text-white">Contato</h4>
+            <div className="space-y-2.5">
+              <Link href="/b2b" className="block text-sm text-white/50 hover:text-white transition-colors">
+                Fale com Vendas
+              </Link>
+              <p className="text-sm text-white/50">contato@nexxustech.com</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom */}
+        <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-white/40">
+            &copy; {new Date().getFullYear()} NexxusTECH. Todos os direitos reservados.
+          </p>
+          <div className="flex gap-6">
+            <span className="text-xs text-white/40 hover:text-white/60 transition-colors cursor-pointer">Termos de Uso</span>
+            <span className="text-xs text-white/40 hover:text-white/60 transition-colors cursor-pointer">Privacidade</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
