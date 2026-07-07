@@ -23,6 +23,7 @@ const Account = lazy(() => import("./pages/Account"));
 const Admin = lazy(() => import("./pages/Admin"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Compare = lazy(() => import("./pages/Compare"));
+const Protocol = lazy(() => import("./pages/Protocol"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function PageLoader() {
@@ -56,6 +57,7 @@ function Router() {
             <Route path="/admin" component={Admin} />
             <Route path="/faq" component={FAQ} />
             <Route path="/comparar" component={Compare} />
+            <Route path="/protocolo" component={Protocol} />
             <Route path="/404" component={NotFound} />
             <Route component={NotFound} />
           </Switch>

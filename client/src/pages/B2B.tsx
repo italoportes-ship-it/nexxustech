@@ -135,14 +135,14 @@ export default function B2B() {
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link href="/">
+                <Link href="/protocolo">
                   <span className="apple-btn apple-btn-primary px-6 py-3">
-                    Voltar ao Início
+                    Consultar Status
                   </span>
                 </Link>
-                <Link href="/softwares">
+                <Link href="/">
                   <span className="apple-btn apple-btn-secondary text-[#0071E3]">
-                    Explorar Produtos <ArrowRight className="w-4 h-4 inline ml-1" />
+                    Voltar ao Início <ArrowRight className="w-4 h-4 inline ml-1" />
                   </span>
                 </Link>
               </div>

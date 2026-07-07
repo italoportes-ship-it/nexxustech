@@ -134,15 +134,25 @@ export default function Admin() {
                 {leads.map((lead) => (
                   <div key={lead.id} className="bento-card !p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-foreground">{lead.companyName}</p>
+                      <div className="flex items-center gap-3">
+                        <p className="text-sm font-medium text-foreground">{lead.companyName}</p>
+                        {(lead as any).protocol && (
+                          <span className="text-[10px] font-mono text-muted-foreground bg-accent px-2 py-0.5 rounded">
+                            {(lead as any).protocol}
+                          </span>
+                        )}
+                      </div>
                       <span className={`text-xs px-2 py-1 rounded-full ${
-                        lead.status === "new" ? "bg-blue-500/10 text-blue-400" : "bg-green-500/10 text-green-400"
+                        lead.status === "new" ? "bg-blue-500/10 text-blue-400" :
+                        lead.status === "contacted" ? "bg-yellow-500/10 text-yellow-400" :
+                        lead.status === "qualified" ? "bg-green-500/10 text-green-400" :
+                        "bg-accent text-muted-foreground"
                       }`}>
                         {lead.status}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground">{lead.contactName} | {lead.email}</p>
-                    {lead.message && <p className="text-xs text-muted-foreground mt-2">{lead.message}</p>}
+                    {lead.message && <p className="text-xs text-muted-foreground/60 mt-2 line-clamp-1">{lead.message}</p>}
                   </div>
                 ))}
                 {leads.length === 0 && <p className="text-center text-muted-foreground py-10">Nenhum lead encontrado.</p>}

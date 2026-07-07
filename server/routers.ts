@@ -129,6 +129,19 @@ export const appRouter = router({
 
   // ===== B2B LEADS =====
   b2b: router({
+    lookup: publicProcedure.input(z.object({
+      protocol: z.string().min(1),
+    })).query(async ({ input }) => {
+      const lead = await db.getLeadByProtocol(input.protocol.toUpperCase().trim());
+      if (!lead) return null;
+      return {
+        protocol: lead.protocol,
+        companyName: lead.companyName,
+        contactName: lead.contactName,
+        status: lead.status,
+        createdAt: lead.createdAt,
+      };
+    }),
     submit: publicProcedure.input(z.object({
       companyName: z.string().min(1),
       contactName: z.string().min(1),
@@ -160,6 +173,12 @@ export const appRouter = router({
         phone: input.phone,
         employees: input.employees,
         message: input.message,
+      });
+
+      // Send confirmation email to client via notification (owner receives and forwards)
+      await notifyOwner({
+        title: `[Enviar ao Cliente] Confirmação de Orçamento - ${protocol}`,
+        content: `ENVIAR PARA: ${input.email}\n\nOlá ${input.contactName},\n\nSua solicitação de orçamento foi recebida com sucesso!\n\nProtocolo: ${protocol}\nEmpresa: ${input.companyName}\n\nNossa equipe comercial entrará em contato em até 24 horas úteis.\n\nVocê pode acompanhar o status em: https://nexxustech.one/protocolo\n\nAtenciosamente,\nEquipe NexxusTECH`
       });
 
       return { success: true, protocol };

@@ -67,3 +67,6 @@
 - [x] Mover chamada CRM para server-side (proteger API key)
 - [x] Adicionar webhook CRM nos pedidos finalizados
 - [x] Página de confirmação B2B com número de protocolo
+- [x] Página de consulta de protocolo (/protocolo)
+- [x] Envio de protocolo por e-mail ao cliente (via notificação ao proprietário)
+- [x] Campo de protocolo no painel admin (listagem de leads)

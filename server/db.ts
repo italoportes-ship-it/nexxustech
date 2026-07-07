@@ -240,6 +240,13 @@ export async function getAllLeads() {
   return db.select().from(b2bLeads).orderBy(desc(b2bLeads.createdAt));
 }
 
+export async function getLeadByProtocol(protocol: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(b2bLeads).where(eq(b2bLeads.protocol, protocol)).limit(1);
+  return result[0];
+}
+
 // ===== CHAT =====
 export async function saveChatMessage(sessionId: string, role: "user" | "assistant" | "system", content: string, userId?: number) {
   const db = await getDb();
