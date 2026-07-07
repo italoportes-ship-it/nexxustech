@@ -137,10 +137,19 @@ export const appRouter = router({
       employees: z.string().optional(),
       message: z.string().optional(),
     })).mutation(async ({ input }) => {
-      await db.createB2BLead(input);
+      // Generate protocol number: NXT-YYYYMMDD-XXXXX
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+      const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
+      const protocol = `NXT-${dateStr}-${randomSuffix}`;
+
+      // Save lead with protocol to database
+      await db.createB2BLead({ ...input, protocol });
+
+      // Notify owner with protocol
       await notifyOwner({
-        title: `Novo Lead B2B: ${input.companyName}`,
-        content: `Empresa: ${input.companyName}\nContato: ${input.contactName}\nEmail: ${input.email}\nTelefone: ${input.phone || 'N/A'}\nFuncionários: ${input.employees || 'N/A'}\nMensagem: ${input.message || 'N/A'}`
+        title: `Novo Lead B2B: ${input.companyName} [${protocol}]`,
+        content: `Protocolo: ${protocol}\nEmpresa: ${input.companyName}\nContato: ${input.contactName}\nEmail: ${input.email}\nTelefone: ${input.phone || 'N/A'}\nFuncionários: ${input.employees || 'N/A'}\nMensagem: ${input.message || 'N/A'}`
       });
 
       // Send lead to CRM webhook
@@ -153,7 +162,7 @@ export const appRouter = router({
         message: input.message,
       });
 
-      return { success: true };
+      return { success: true, protocol };
     }),
   }),
 

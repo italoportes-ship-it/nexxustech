@@ -228,7 +228,7 @@ export async function getAllOrders() {
 }
 
 // ===== B2B LEADS =====
-export async function createB2BLead(data: { companyName: string; contactName: string; email: string; phone?: string; employees?: string; message?: string }) {
+export async function createB2BLead(data: { companyName: string; contactName: string; email: string; phone?: string; employees?: string; message?: string; protocol?: string }) {
   const db = await getDb();
   if (!db) return;
   await db.insert(b2bLeads).values(data);

@@ -1,10 +1,11 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { trpc } from "@/lib/trpc";
-import { Building2, Users, HeadphonesIcon, FileText, ArrowRight, Check } from "lucide-react";
+import { Building2, Users, HeadphonesIcon, FileText, ArrowRight, Check, CheckCircle, Copy, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Link } from "wouter";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
@@ -42,12 +43,17 @@ export default function B2B() {
     employees: "",
     message: "",
   });
+  const [submitted, setSubmitted] = useState(false);
+  const [protocol, setProtocol] = useState("");
+  const [submittedName, setSubmittedName] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     submitLead.mutate(form, {
-      onSuccess: () => {
-        toast.success("Solicitação enviada com sucesso! Nossa equipe entrará em contato em breve.");
+      onSuccess: (data) => {
+        setProtocol(data.protocol || "");
+        setSubmittedName(form.contactName);
+        setSubmitted(true);
         setForm({ companyName: "", contactName: "", email: "", phone: "", employees: "", message: "" });
       },
       onError: () => {
@@ -55,6 +61,98 @@ export default function B2B() {
       },
     });
   };
+
+  const copyProtocol = () => {
+    navigator.clipboard.writeText(protocol);
+    toast.success("Protocolo copiado!");
+  };
+
+  // Confirmation page after successful submission
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <section className="pt-24 md:pt-32 pb-16 md:pb-24">
+          <div className="container max-w-2xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              className="text-center"
+            >
+              {/* Success icon */}
+              <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-8">
+                <CheckCircle className="w-10 h-10 text-green-400" />
+              </div>
+
+              <h1 className="text-headline text-foreground mb-4">
+                Solicitação Enviada!
+              </h1>
+              <p className="text-body-large text-muted-foreground mb-10">
+                Obrigado, {submittedName}. Nossa equipe comercial entrará em contato em até 24 horas úteis.
+              </p>
+
+              {/* Protocol card */}
+              <div className="bento-card !p-8 mb-8 text-center">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
+                  Número de Protocolo
+                </p>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-2xl md:text-3xl font-bold text-foreground tracking-wide font-mono">
+                    {protocol}
+                  </span>
+                  <button
+                    onClick={copyProtocol}
+                    className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                    title="Copiar protocolo"
+                  >
+                    <Copy className="w-5 h-5" />
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-4">
+                  Guarde este número para acompanhar sua solicitação.
+                </p>
+              </div>
+
+              {/* Next steps */}
+              <div className="bento-card !p-6 text-left mb-10">
+                <h3 className="text-sm font-semibold text-foreground mb-4">Próximos passos</h3>
+                <div className="space-y-3">
+                  {[
+                    "Nossa equipe analisará sua solicitação e preparará um orçamento personalizado.",
+                    "Você receberá um contato por e-mail ou telefone em até 24h úteis.",
+                    "Após aprovação, liberamos as licenças com suporte dedicado.",
+                  ].map((step, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#0071E3]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-[#0071E3]">{i + 1}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{step}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link href="/">
+                  <span className="apple-btn apple-btn-primary px-6 py-3">
+                    Voltar ao Início
+                  </span>
+                </Link>
+                <Link href="/softwares">
+                  <span className="apple-btn apple-btn-secondary text-[#0071E3]">
+                    Explorar Produtos <ArrowRight className="w-4 h-4 inline ml-1" />
+                  </span>
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
 
   const benefits = [
     { icon: <Building2 className="w-6 h-6" />, title: "Licenciamento em Volume", desc: "Preços especiais para grandes quantidades de licenças." },

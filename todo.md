@@ -66,3 +66,4 @@
 - [x] Integração com CRM (nexxuscrm.one) - envio automático de leads B2B, pedidos e newsletter
 - [x] Mover chamada CRM para server-side (proteger API key)
 - [x] Adicionar webhook CRM nos pedidos finalizados
+- [x] Página de confirmação B2B com número de protocolo

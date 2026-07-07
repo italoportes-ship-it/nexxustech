@@ -115,6 +115,7 @@ export const b2bLeads = mysqlTable("b2bLeads", {
   employees: varchar("employees", { length: 50 }),
   message: text("message"),
   status: mysqlEnum("status", ["new", "contacted", "qualified", "closed"]).default("new").notNull(),
+  protocol: varchar("protocol", { length: 30 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
