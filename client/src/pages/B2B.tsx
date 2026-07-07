@@ -46,7 +46,23 @@ export default function B2B() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     submitLead.mutate(form, {
-      onSuccess: () => {
+      onSuccess: async () => {
+        // Enviar lead ao CRM
+        try {
+          await fetch('https://nexxuscrm.one/api/webhooks/lead', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': 'nxt_msw7pll028ydjx5xogums8y81qmkgh3o' },
+            body: JSON.stringify({
+              title: `Orçamento B2B - ${form.companyName} (${form.contactName})`,
+              value: '0',
+              summary: form.message,
+              customFields: { empresa: form.companyName, nome: form.contactName, email: form.email, telefone: form.phone, funcionarios: form.employees, origem: 'nexxustech.one/b2b' }
+            })
+          });
+        } catch (err) {
+          console.error('[CRM Webhook] Failed:', err);
+        }
+
         toast.success("Solicitação enviada com sucesso! Nossa equipe entrará em contato em breve.");
         setForm({ companyName: "", contactName: "", email: "", phone: "", employees: "", message: "" });
       },
