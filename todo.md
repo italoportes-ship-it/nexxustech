@@ -63,3 +63,4 @@
 - [x] Sistema de avaliação de produtos (estrelas + comentário)
 - [x] Comparador de produtos lado a lado
 - [x] Newsletter no footer com captura de e-mail
+- [x] Integração com CRM (nexxuscrm.one) - envio automático de leads B2B, pedidos e newsletter
