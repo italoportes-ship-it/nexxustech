@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { Request, Response } from "express";
 import * as db from "./db";
 import { notifyOwner } from "./_core/notification";
+import { sendOrderToCRM } from "./crm";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2025-04-30.basil" as any,
@@ -79,6 +80,16 @@ export function registerStripeWebhook(app: any) {
           await notifyOwner({
             title: `Pagamento Confirmado - Pedido #${orderId}`,
             content: `O pagamento do pedido #${orderId} foi confirmado!\nCliente: ${customerName}\nE-mail: ${session.customer_email || 'N/A'}\nValor: R$ ${amount}\nID Stripe: ${session.id}`,
+          });
+
+          // Send confirmed order to CRM
+          const orderItems = await db.getOrderItems(orderId);
+          await sendOrderToCRM({
+            orderId,
+            customerName,
+            customerEmail: session.customer_email || session.metadata?.customer_email || "",
+            totalAmount: amount,
+            items: orderItems.map(i => i.productName),
           });
         }
         break;

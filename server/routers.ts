@@ -7,7 +7,7 @@ import * as db from "./db";
 import { invokeLLM } from "./_core/llm";
 import { notifyOwner } from "./_core/notification";
 import { createCheckoutSession } from "./stripe";
-import { sendLeadToCRM, sendOrderToCRM } from "./crm";
+import { sendB2BLeadToCRM, sendNewsletterToCRM } from "./crm";
 
 export const appRouter = router({
   system: systemRouter,
@@ -99,14 +99,7 @@ export const appRouter = router({
         content: `Um novo pedido foi realizado por ${ctx.user.name || ctx.user.email || 'Cliente'}. Total: R$ ${total.toFixed(2)}. Itens: ${cartItems.map(i => i.product.name).join(', ')}.`
       });
 
-      // Send order to CRM
-      await sendOrderToCRM({
-        orderId,
-        customerName: ctx.user.name || ctx.user.email || 'Cliente',
-        customerEmail: ctx.user.email || '',
-        totalAmount: total.toFixed(2),
-        items: cartItems.map(i => i.product.name),
-      });
+      // CRM notification happens on payment confirmation (Stripe webhook)
 
       // Create Stripe checkout session
       const origin = ctx.req.headers.origin || `${ctx.req.protocol}://${ctx.req.headers.host}`;
@@ -150,15 +143,14 @@ export const appRouter = router({
         content: `Empresa: ${input.companyName}\nContato: ${input.contactName}\nEmail: ${input.email}\nTelefone: ${input.phone || 'N/A'}\nFuncionários: ${input.employees || 'N/A'}\nMensagem: ${input.message || 'N/A'}`
       });
 
-      // Send lead to CRM
-      await sendLeadToCRM({
-        title: `Lead B2B - ${input.companyName}`,
+      // Send lead to CRM webhook
+      await sendB2BLeadToCRM({
+        companyName: input.companyName,
         contactName: input.contactName,
-        contactEmail: input.email,
-        contactPhone: input.phone,
-        company: input.companyName,
-        source: "NexxusTECH - Formulário B2B",
-        notes: `Funcionários: ${input.employees || 'N/A'}\nMensagem: ${input.message || 'N/A'}`,
+        email: input.email,
+        phone: input.phone,
+        employees: input.employees,
+        message: input.message,
       });
 
       return { success: true };
@@ -246,13 +238,7 @@ Seja profissional, amigável e direto. Responda sempre em português brasileiro.
       const success = await db.subscribeNewsletter(input.email);
       if (success) {
         // Send newsletter subscriber as lead to CRM
-        await sendLeadToCRM({
-          title: `Newsletter - ${input.email}`,
-          contactName: input.email.split("@")[0],
-          contactEmail: input.email,
-          source: "NexxusTECH - Newsletter",
-          notes: "Inscrito na newsletter do site.",
-        });
+        await sendNewsletterToCRM(input.email);
       }
       if (!success) return { success: true, message: "Você já está inscrito!" };
       return { success: true, message: "Inscrito com sucesso!" };
