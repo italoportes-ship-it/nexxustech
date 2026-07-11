@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const CRM_WEBHOOK_URL = "https://nexxuscrm.one/api/webhooks/lead";
+const CRM_WEBHOOK_URL = process.env.CRM_WEBHOOK_URL || "https://nexxus-crm.onrender.com/api/webhooks/lead";
 const CRM_API_KEY = process.env.CRM_API_KEY || "";
 
 interface CRMLeadPayload {
