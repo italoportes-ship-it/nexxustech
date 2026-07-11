@@ -1,46 +1,93 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import axios from "axios";
+import { sendB2BLeadToCRM } from "./crm";
 
-const CRM_BASE_URL = "https://nexxuscrm.one";
-const CRM_API_KEY = process.env.CRM_API_KEY || "";
+vi.mock("axios", () => ({
+  default: {
+    post: vi.fn(),
+  },
+}));
 
-describe("CRM API Integration", () => {
-  it("CRM_API_KEY environment variable is set", () => {
-    expect(CRM_API_KEY).toBeTruthy();
-    expect(CRM_API_KEY.startsWith("nxt_")).toBe(true);
+const mockedPost = vi.mocked(axios.post);
+
+describe("Integração Site → Nexxus CRM", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.env.CRM_URL = "https://nexxus-crm.onrender.com";
+    process.env.CRM_INTAKE_KEY = "chave-segura-de-teste";
+    delete process.env.CRM_WEBHOOK_URL;
   });
 
-  it("CRM API is reachable and accepts the key for system routes", async () => {
-    // The x-api-key authenticates for system routes (returns FORBIDDEN, not UNAUTHORIZED)
-    const response = await axios.post(
-      `${CRM_BASE_URL}/api/trpc/system.notifyOwner`,
-      { json: { title: "Test", content: "Connectivity test" } },
+  it("envia o formulário B2B ao endpoint público com a chave e o protocolo", async () => {
+    mockedPost.mockResolvedValue({ status: 201, data: { success: true } });
+
+    const result = await sendB2BLeadToCRM({
+      companyName: "Empresa Teste",
+      contactName: "Contato Teste",
+      email: "contato@example.com",
+      phone: "+55 11 99999-9999",
+      employees: "11 - 50",
+      message: "Quero uma cotação",
+      protocol: "NXT-20260711-TESTE",
+    });
+
+    expect(result).toEqual({ success: true });
+    expect(mockedPost).toHaveBeenCalledWith(
+      "https://nexxus-crm.onrender.com/api/public/leads",
+      {
+        companyName: "Empresa Teste",
+        contactName: "Contato Teste",
+        email: "contato@example.com",
+        phone: "+55 11 99999-9999",
+        employees: "11 - 50",
+        message: "Quero uma cotação",
+        protocol: "NXT-20260711-TESTE",
+        origem: "nexxustech.one/b2b",
+      },
       {
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": CRM_API_KEY,
+          "x-intake-key": "chave-segura-de-teste",
         },
-        validateStatus: () => true,
+        timeout: 10000,
       }
     );
-
-    // FORBIDDEN (403) means the key authenticated but lacks admin permission
-    // This confirms the key is valid and the CRM is reachable
-    expect(response.status).toBe(403);
-    expect(response.data?.error?.json?.message).toContain("permission");
   });
 
-  it("CRM deals.create endpoint exists", async () => {
-    // Verify the endpoint exists (even if auth fails for now)
-    const response = await axios.get(
-      `${CRM_BASE_URL}/api/trpc/deals.create`,
-      {
-        headers: { "x-api-key": CRM_API_KEY },
-        validateStatus: () => true,
-      }
-    );
+  it("não envia requisição quando a chave do CRM não está configurada", async () => {
+    delete process.env.CRM_INTAKE_KEY;
 
-    // 405 = method not supported for GET on mutation = endpoint exists
-    expect(response.status).toBe(405);
+    const result = await sendB2BLeadToCRM({
+      companyName: "Empresa sem chave",
+      contactName: "Contato",
+      email: "contato@example.com",
+    });
+
+    expect(result).toEqual({
+      success: false,
+      error: "CRM_INTAKE_KEY não configurada",
+    });
+    expect(mockedPost).not.toHaveBeenCalled();
+  });
+
+  it("retorna erro controlado quando o CRM rejeita a chave", async () => {
+    mockedPost.mockRejectedValue({
+      response: {
+        data: {
+          error: { message: "Chave de captura inválida." },
+        },
+      },
+    });
+
+    const result = await sendB2BLeadToCRM({
+      companyName: "Empresa",
+      contactName: "Contato",
+      email: "contato@example.com",
+    });
+
+    expect(result).toEqual({
+      success: false,
+      error: "Chave de captura inválida.",
+    });
   });
 });

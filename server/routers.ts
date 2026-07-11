@@ -173,6 +173,7 @@ export const appRouter = router({
         phone: input.phone,
         employees: input.employees,
         message: input.message,
+        protocol,
       });
 
       // Send confirmation email to client via notification (owner receives and forwards)
