@@ -11,6 +11,6 @@
 - [x] Confirmar a mesma chave como `INTAKE_KEY` no CRM do Render
 - [x] Executar testes Vitest, verificação TypeScript e build de produção
 - [x] Validar o formulário B2B no preview local
-- [ ] Salvar checkpoint publicável do projeto
-- [ ] Publicar a versão atualizada
-- [ ] Executar teste ponta a ponta e confirmar o lead na etapa Novo Lead do CRM
+- [x] Salvar checkpoint publicável do projeto
+- [x] Publicar a versão atualizada
+- [x] Executar teste ponta a ponta e confirmar o lead na etapa Novo Lead do CRM
