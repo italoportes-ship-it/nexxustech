@@ -1,45 +1,70 @@
 import axios from "axios";
 
-const CRM_WEBHOOK_URL = "https://nexxuscrm.one/api/webhooks/lead";
-const CRM_API_KEY = process.env.CRM_API_KEY || "";
+const DEFAULT_CRM_URL = "https://nexxus-crm.onrender.com";
 
 interface CRMLeadPayload {
-  title: string;
-  value: string;
+  companyName?: string;
+  contactName?: string;
+  email?: string;
+  phone?: string;
+  employees?: string;
+  message?: string;
+  protocol?: string;
+  origem?: string;
+  title?: string;
+  value?: string;
   summary?: string;
-  customFields: Record<string, string>;
+  customFields?: Record<string, string>;
+}
+
+function getCRMConfig() {
+  const baseUrl = (process.env.CRM_URL || DEFAULT_CRM_URL).replace(/\/+$/, "");
+
+  return {
+    leadsUrl: process.env.CRM_WEBHOOK_URL || `${baseUrl}/api/public/leads`,
+    intakeKey: process.env.CRM_INTAKE_KEY || "",
+  };
 }
 
 /**
- * Send a lead to the NexxusCRM webhook endpoint.
- * Creates a deal in the "Form Orçamento" stage of the CRM pipeline.
+ * Envia um lead do backend do site ao endpoint público do Nexxus CRM.
+ * A chave permanece exclusivamente no servidor e nunca é exposta ao navegador.
  */
 async function sendToCRM(payload: CRMLeadPayload): Promise<{ success: boolean; error?: string }> {
-  if (!CRM_API_KEY) {
-    console.warn("[CRM] API key not configured, skipping CRM integration");
-    return { success: false, error: "API key not configured" };
+  const { leadsUrl, intakeKey } = getCRMConfig();
+
+  if (!intakeKey) {
+    console.warn("[CRM] CRM_INTAKE_KEY não configurada; integração ignorada");
+    return { success: false, error: "CRM_INTAKE_KEY não configurada" };
   }
 
   try {
-    const response = await axios.post(CRM_WEBHOOK_URL, payload, {
+    await axios.post(leadsUrl, payload, {
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": CRM_API_KEY,
+        "x-intake-key": intakeKey,
       },
       timeout: 10000,
     });
 
-    console.log("[CRM] Lead sent successfully:", payload.title);
+    console.log(
+      "[CRM] Lead enviado com sucesso:",
+      payload.protocol || payload.companyName || payload.title || payload.email
+    );
     return { success: true };
   } catch (error: any) {
-    const errorMsg = error?.response?.data?.message || error?.message || "Unknown error";
-    console.error("[CRM] Failed to send lead:", errorMsg);
+    const errorMsg =
+      error?.response?.data?.error?.message ||
+      error?.response?.data?.message ||
+      error?.message ||
+      "Erro desconhecido";
+    console.error("[CRM] Falha ao enviar lead:", errorMsg);
     return { success: false, error: errorMsg };
   }
 }
 
 /**
- * Send a B2B lead from the contact form to the CRM.
+ * Envia ao CRM um lead originado pelo formulário B2B do site.
  */
 export async function sendB2BLeadToCRM(data: {
   companyName: string;
@@ -48,24 +73,16 @@ export async function sendB2BLeadToCRM(data: {
   phone?: string;
   employees?: string;
   message?: string;
-}): Promise<{ success: boolean }> {
+  protocol?: string;
+}): Promise<{ success: boolean; error?: string }> {
   return sendToCRM({
-    title: `Orçamento B2B - ${data.companyName} (${data.contactName})`,
-    value: "0",
-    summary: data.message || "",
-    customFields: {
-      empresa: data.companyName,
-      nome: data.contactName,
-      email: data.email,
-      telefone: data.phone || "",
-      funcionarios: data.employees || "",
-      origem: "nexxustech.one/b2b",
-    },
+    ...data,
+    origem: "nexxustech.one/b2b",
   });
 }
 
 /**
- * Send an order as a deal to the CRM pipeline.
+ * Envia um pedido confirmado como negócio ganho no CRM.
  */
 export async function sendOrderToCRM(data: {
   orderId: number;
@@ -73,7 +90,7 @@ export async function sendOrderToCRM(data: {
   customerEmail: string;
   totalAmount: string;
   items: string[];
-}): Promise<{ success: boolean }> {
+}): Promise<{ success: boolean; error?: string }> {
   return sendToCRM({
     title: `Pedido #${data.orderId} - ${data.customerName}`,
     value: data.totalAmount,
@@ -90,12 +107,15 @@ export async function sendOrderToCRM(data: {
 }
 
 /**
- * Send a newsletter subscriber as a lead to the CRM.
+ * Envia uma inscrição da newsletter como lead de marketing no CRM.
  */
-export async function sendNewsletterToCRM(email: string): Promise<{ success: boolean }> {
+export async function sendNewsletterToCRM(
+  email: string
+): Promise<{ success: boolean; error?: string }> {
   return sendToCRM({
+    email,
+    origem: "nexxustech.one/newsletter",
     title: `Newsletter - ${email}`,
-    value: "0",
     summary: "Inscrito na newsletter do site.",
     customFields: {
       email,
