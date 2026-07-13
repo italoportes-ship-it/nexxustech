@@ -1,4 +1,4 @@
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, gte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, categories, products, orders, orderItems, cartItems, b2bLeads, chatMessages, reviews, newsletterSubscribers } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -228,10 +228,11 @@ export async function getAllOrders() {
 }
 
 // ===== B2B LEADS =====
-export async function createB2BLead(data: { companyName: string; contactName: string; email: string; phone?: string; employees?: string; message?: string; protocol?: string }) {
+export async function createB2BLead(data: typeof b2bLeads.$inferInsert) {
   const db = await getDb();
-  if (!db) return;
-  await db.insert(b2bLeads).values(data);
+  if (!db) throw new Error("Banco de dados indisponível");
+  const result = await db.insert(b2bLeads).values(data);
+  return Number((result[0] as { insertId: number }).insertId);
 }
 
 export async function getAllLeads() {
@@ -240,11 +241,60 @@ export async function getAllLeads() {
   return db.select().from(b2bLeads).orderBy(desc(b2bLeads.createdAt));
 }
 
+export async function getB2BLeadById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(b2bLeads).where(eq(b2bLeads.id, id)).limit(1);
+  return result[0];
+}
+
 export async function getLeadByProtocol(protocol: string) {
   const db = await getDb();
   if (!db) return undefined;
   const result = await db.select().from(b2bLeads).where(eq(b2bLeads.protocol, protocol)).limit(1);
   return result[0];
+}
+
+export async function findRecentDuplicateB2BLead(email: string, companyName: string, since: Date) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(b2bLeads).where(and(
+    eq(b2bLeads.email, email),
+    eq(b2bLeads.companyName, companyName),
+    gte(b2bLeads.createdAt, since),
+  )).orderBy(desc(b2bLeads.createdAt)).limit(1);
+  return result[0];
+}
+
+export async function countRecentB2BLeadsByEmail(email: string, since: Date) {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db.select({ count: sql<number>`count(*)` }).from(b2bLeads).where(and(
+    eq(b2bLeads.email, email),
+    gte(b2bLeads.createdAt, since),
+  ));
+  return Number(result[0]?.count || 0);
+}
+
+export async function countRecentB2BLeadsByIpHash(ipHash: string, since: Date) {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db.select({ count: sql<number>`count(*)` }).from(b2bLeads).where(and(
+    eq(b2bLeads.ipHash, ipHash),
+    gte(b2bLeads.createdAt, since),
+  ));
+  return Number(result[0]?.count || 0);
+}
+
+export async function updateB2BLeadCrmSync(
+  id: number,
+  data: Partial<Pick<typeof b2bLeads.$inferInsert,
+    "crmSyncStatus" | "crmSyncAttempts" | "crmLeadId" | "crmLastError" | "crmSyncedAt" | "crmLastAttemptAt"
+  >>,
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível");
+  await db.update(b2bLeads).set(data).where(eq(b2bLeads.id, id));
 }
 
 // ===== CHAT =====

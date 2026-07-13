@@ -3,7 +3,7 @@ import Footer from "@/components/Footer";
 import { trpc } from "@/lib/trpc";
 import { Building2, Users, HeadphonesIcon, FileText, ArrowRight, Check, CheckCircle, Copy, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
 
@@ -35,6 +35,8 @@ const cardReveal = {
 
 export default function B2B() {
   const submitLead = trpc.b2b.submit.useMutation();
+  const formStartedAt = useRef(Date.now());
+  const [website, setWebsite] = useState("");
   const [form, setForm] = useState({
     companyName: "",
     contactName: "",
@@ -49,12 +51,14 @@ export default function B2B() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    submitLead.mutate(form, {
+    submitLead.mutate({ ...form, website, formStartedAt: formStartedAt.current }, {
       onSuccess: (data) => {
         setProtocol(data.protocol || "");
         setSubmittedName(form.contactName);
         setSubmitted(true);
         setForm({ companyName: "", contactName: "", email: "", phone: "", employees: "", message: "" });
+        setWebsite("");
+        formStartedAt.current = Date.now();
       },
       onError: () => {
         toast.error("Erro ao enviar. Verifique os campos e tente novamente.");
@@ -257,8 +261,21 @@ export default function B2B() {
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.7, delay: 0.15, ease: [0.23, 1, 0.32, 1] }}
               onSubmit={handleSubmit}
-              className="space-y-5"
+              className="relative space-y-5"
             >
+              <div className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+                <label htmlFor="b2b-website">Website</label>
+                <input
+                  id="b2b-website"
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={website}
+                  onChange={(event) => setWebsite(event.target.value)}
+                />
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-xs font-medium text-muted-foreground mb-2">Nome da Empresa *</label>

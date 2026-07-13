@@ -2,20 +2,28 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Package, Users, ShoppingCart, MessageSquare, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock3, Package, RefreshCw, Users, ShoppingCart, MessageSquare, Plus, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 
+type AdminTab = "products" | "orders" | "leads" | "users";
+
+function getInitialAdminTab(): AdminTab {
+  const tab = new URLSearchParams(window.location.search).get("tab");
+  return tab === "orders" || tab === "leads" || tab === "users" ? tab : "products";
+}
+
 export default function Admin() {
   const { user, isAuthenticated } = useAuth({ redirectOnUnauthenticated: true });
-  const [activeTab, setActiveTab] = useState<"products" | "orders" | "leads" | "users">("products");
+  const [activeTab, setActiveTab] = useState<AdminTab>(getInitialAdminTab);
 
   const productsQuery = trpc.admin.products.list.useQuery(undefined, { enabled: isAuthenticated && user?.role === "admin" });
   const ordersQuery = trpc.admin.orders.list.useQuery(undefined, { enabled: isAuthenticated && user?.role === "admin" && activeTab === "orders" });
   const leadsQuery = trpc.admin.leads.list.useQuery(undefined, { enabled: isAuthenticated && user?.role === "admin" && activeTab === "leads" });
   const usersQuery = trpc.admin.users.list.useQuery(undefined, { enabled: isAuthenticated && user?.role === "admin" && activeTab === "users" });
   const deleteMutation = trpc.admin.products.delete.useMutation();
+  const reprocessLeadMutation = trpc.admin.leads.reprocess.useMutation();
   const utils = trpc.useUtils();
 
   if (user?.role !== "admin") {
@@ -38,6 +46,17 @@ export default function Admin() {
         toast.success("Produto desativado.");
         utils.admin.products.list.invalidate();
       },
+    });
+  };
+
+  const handleReprocessLead = (id: number) => {
+    reprocessLeadMutation.mutate({ id }, {
+      onSuccess: (result) => {
+        if (result.success) toast.success("Lead sincronizado com o CRM.");
+        else toast.error(result.error || "Não foi possível sincronizar o lead.");
+        utils.admin.leads.list.invalidate();
+      },
+      onError: (error) => toast.error(error.message || "Falha ao reprocessar o lead."),
     });
   };
 
@@ -133,26 +152,61 @@ export default function Admin() {
               <div className="space-y-3">
                 {leads.map((lead) => (
                   <div key={lead.id} className="bento-card !p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <p className="text-sm font-medium text-foreground">{lead.companyName}</p>
-                        {(lead as any).protocol && (
-                          <span className="text-[10px] font-mono text-muted-foreground bg-accent px-2 py-0.5 rounded">
-                            {(lead as any).protocol}
-                          </span>
-                        )}
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <p className="text-sm font-medium text-foreground">{lead.companyName}</p>
+                          {lead.protocol && (
+                            <span className="text-[10px] font-mono text-muted-foreground bg-accent px-2 py-0.5 rounded">
+                              {lead.protocol}
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-2 text-xs text-muted-foreground">{lead.contactName} | {lead.email}</p>
+                        {lead.message && <p className="mt-2 text-xs text-muted-foreground/60 line-clamp-2">{lead.message}</p>}
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        lead.status === "new" ? "bg-blue-500/10 text-blue-400" :
-                        lead.status === "contacted" ? "bg-yellow-500/10 text-yellow-400" :
-                        lead.status === "qualified" ? "bg-green-500/10 text-green-400" :
-                        "bg-accent text-muted-foreground"
-                      }`}>
-                        {lead.status}
-                      </span>
+
+                      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          lead.status === "new" ? "bg-blue-500/10 text-blue-400" :
+                          lead.status === "contacted" ? "bg-yellow-500/10 text-yellow-400" :
+                          lead.status === "qualified" ? "bg-green-500/10 text-green-400" :
+                          "bg-accent text-muted-foreground"
+                        }`}>
+                          {lead.status}
+                        </span>
+                        <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-full ${
+                          lead.crmSyncStatus === "synced" ? "bg-green-500/10 text-green-400" :
+                          lead.crmSyncStatus === "failed" ? "bg-red-500/10 text-red-400" :
+                          "bg-yellow-500/10 text-yellow-400"
+                        }`}>
+                          {lead.crmSyncStatus === "synced" ? <CheckCircle2 className="h-3 w-3" /> :
+                            lead.crmSyncStatus === "failed" ? <AlertTriangle className="h-3 w-3" /> :
+                            <Clock3 className="h-3 w-3" />}
+                          {lead.crmSyncStatus === "synced" ? "CRM sincronizado" :
+                            lead.crmSyncStatus === "failed" ? "Falha no CRM" : "CRM pendente"}
+                        </span>
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground">{lead.contactName} | {lead.email}</p>
-                    {lead.message && <p className="text-xs text-muted-foreground/60 mt-2 line-clamp-1">{lead.message}</p>}
+
+                    <div className="mt-3 flex flex-col gap-2 border-t border-border/60 pt-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="text-[11px] text-muted-foreground">
+                        {lead.crmSyncAttempts} tentativa{lead.crmSyncAttempts === 1 ? "" : "s"}
+                        {lead.crmLastAttemptAt && ` · Última: ${new Date(lead.crmLastAttemptAt).toLocaleString("pt-BR")}`}
+                        {lead.crmLastError && <p className="mt-1 max-w-2xl text-red-400/80">{lead.crmLastError}</p>}
+                      </div>
+                      {lead.crmSyncStatus !== "synced" && (
+                        <button
+                          type="button"
+                          onClick={() => handleReprocessLead(lead.id)}
+                          disabled={reprocessLeadMutation.isPending && reprocessLeadMutation.variables?.id === lead.id}
+                          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0071E3] px-4 py-2 text-xs font-medium text-white transition-transform active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <RefreshCw className={`h-3.5 w-3.5 ${reprocessLeadMutation.isPending && reprocessLeadMutation.variables?.id === lead.id ? "animate-spin" : ""}`} />
+                          {lead.crmSyncStatus === "failed" ? "Reprocessar" : "Sincronizar"}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
                 {leads.length === 0 && <p className="text-center text-muted-foreground py-10">Nenhum lead encontrado.</p>}

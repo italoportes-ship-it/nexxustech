@@ -116,6 +116,13 @@ export const b2bLeads = mysqlTable("b2bLeads", {
   message: text("message"),
   status: mysqlEnum("status", ["new", "contacted", "qualified", "closed"]).default("new").notNull(),
   protocol: varchar("protocol", { length: 30 }),
+  ipHash: varchar("ipHash", { length: 64 }),
+  crmSyncStatus: mysqlEnum("crmSyncStatus", ["pending", "synced", "failed"]).default("pending").notNull(),
+  crmSyncAttempts: int("crmSyncAttempts").default(0).notNull(),
+  crmLeadId: int("crmLeadId"),
+  crmLastError: text("crmLastError"),
+  crmSyncedAt: timestamp("crmSyncedAt"),
+  crmLastAttemptAt: timestamp("crmLastAttemptAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

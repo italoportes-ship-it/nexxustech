@@ -2,6 +2,13 @@ import axios from "axios";
 
 const DEFAULT_CRM_URL = "https://nexxus-crm.onrender.com";
 
+export interface CRMDeliveryResult {
+  success: boolean;
+  error?: string;
+  crmLeadId?: number;
+  deduplicated?: boolean;
+}
+
 interface CRMLeadPayload {
   companyName?: string;
   contactName?: string;
@@ -30,7 +37,7 @@ function getCRMConfig() {
  * Envia um lead do backend do site ao endpoint público do Nexxus CRM.
  * A chave permanece exclusivamente no servidor e nunca é exposta ao navegador.
  */
-async function sendToCRM(payload: CRMLeadPayload): Promise<{ success: boolean; error?: string }> {
+async function sendToCRM(payload: CRMLeadPayload): Promise<CRMDeliveryResult> {
   const { leadsUrl, intakeKey } = getCRMConfig();
 
   if (!intakeKey) {
@@ -39,7 +46,7 @@ async function sendToCRM(payload: CRMLeadPayload): Promise<{ success: boolean; e
   }
 
   try {
-    await axios.post(leadsUrl, payload, {
+    const response = await axios.post(leadsUrl, payload, {
       headers: {
         "Content-Type": "application/json",
         "x-intake-key": intakeKey,
@@ -51,7 +58,11 @@ async function sendToCRM(payload: CRMLeadPayload): Promise<{ success: boolean; e
       "[CRM] Lead enviado com sucesso:",
       payload.protocol || payload.companyName || payload.title || payload.email
     );
-    return { success: true };
+    return {
+      success: true,
+      crmLeadId: response.data?.data?.id,
+      deduplicated: Boolean(response.data?.data?.deduplicated),
+    };
   } catch (error: any) {
     const errorMsg =
       error?.response?.data?.error?.message ||
@@ -74,7 +85,7 @@ export async function sendB2BLeadToCRM(data: {
   employees?: string;
   message?: string;
   protocol?: string;
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<CRMDeliveryResult> {
   return sendToCRM({
     ...data,
     origem: "nexxustech.one/b2b",
@@ -90,7 +101,7 @@ export async function sendOrderToCRM(data: {
   customerEmail: string;
   totalAmount: string;
   items: string[];
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<CRMDeliveryResult> {
   return sendToCRM({
     title: `Pedido #${data.orderId} - ${data.customerName}`,
     value: data.totalAmount,
@@ -111,7 +122,7 @@ export async function sendOrderToCRM(data: {
  */
 export async function sendNewsletterToCRM(
   email: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<CRMDeliveryResult> {
   return sendToCRM({
     email,
     origem: "nexxustech.one/newsletter",

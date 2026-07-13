@@ -19,7 +19,10 @@ describe("Integração Site → Nexxus CRM", () => {
   });
 
   it("envia o formulário B2B ao endpoint público com a chave e o protocolo", async () => {
-    mockedPost.mockResolvedValue({ status: 201, data: { success: true } });
+    mockedPost.mockResolvedValue({
+      status: 201,
+      data: { success: true, data: { id: 123, deduplicated: false } },
+    });
 
     const result = await sendB2BLeadToCRM({
       companyName: "Empresa Teste",
@@ -31,7 +34,7 @@ describe("Integração Site → Nexxus CRM", () => {
       protocol: "NXT-20260711-TESTE",
     });
 
-    expect(result).toEqual({ success: true });
+    expect(result).toEqual({ success: true, crmLeadId: 123, deduplicated: false });
     expect(mockedPost).toHaveBeenCalledWith(
       "https://nexxus-crm.onrender.com/api/public/leads",
       {

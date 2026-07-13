@@ -14,3 +14,20 @@
 - [x] Salvar checkpoint publicável do projeto
 - [x] Publicar a versão atualizada
 - [x] Executar teste ponta a ponta e confirmar o lead na etapa Novo Lead do CRM
+
+- [x] Adicionar campo honeypot invisível ao formulário B2B
+- [x] Implementar limitação de frequência servidor-side por IP e e-mail
+- [x] Rejeitar submissões rápidas demais ou com honeypot preenchido sem revelar a regra
+- [x] Persistir estado, tentativas, erro e data de sincronização do lead com o CRM
+- [x] Alertar o proprietário quando o CRM rejeitar ou não receber um lead
+- [x] Criar procedimento administrativo seguro para reprocessar leads com falha
+- [x] Exibir no painel administrativo o status de sincronização e a ação Reprocessar
+- [x] Criar e aplicar migração de banco para os campos de sincronização
+- [x] Adicionar testes automatizados para anti-spam, falha e reprocessamento
+- [x] Executar Vitest, verificação TypeScript e build de produção
+- [x] Validar o formulário e o painel administrativo no preview
+- [ ] Salvar checkpoint publicável da proteção anti-spam e reprocessamento
+- [ ] Publicar a versão atualizada e validar o fluxo em produção
+- [x] Garantir idempotência no endpoint do CRM usando o protocolo do site
+- [x] Publicar a idempotência no CRM e validar reprocessamento sem duplicação
+- [x] Aplicar a estratégia nativa invisível selecionada, sem CAPTCHA externo
