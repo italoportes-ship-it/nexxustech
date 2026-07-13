@@ -26,8 +26,8 @@
 - [x] Adicionar testes automatizados para anti-spam, falha e reprocessamento
 - [x] Executar Vitest, verificação TypeScript e build de produção
 - [x] Validar o formulário e o painel administrativo no preview
-- [ ] Salvar checkpoint publicável da proteção anti-spam e reprocessamento
-- [ ] Publicar a versão atualizada e validar o fluxo em produção
+- [x] Salvar checkpoint publicável da proteção anti-spam e reprocessamento
+- [x] Publicar a versão atualizada e validar o fluxo em produção
 - [x] Garantir idempotência no endpoint do CRM usando o protocolo do site
 - [x] Publicar a idempotência no CRM e validar reprocessamento sem duplicação
 - [x] Aplicar a estratégia nativa invisível selecionada, sem CAPTCHA externo
