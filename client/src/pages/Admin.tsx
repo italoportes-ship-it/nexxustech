@@ -1,17 +1,19 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PricingManager from "@/components/admin/PricingManager";
+import PdsManager from "@/components/admin/PdsManager";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { AlertTriangle, CheckCircle2, Clock3, Package, RefreshCw, Users, ShoppingCart, MessageSquare, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock3, DollarSign, FileUp, Package, RefreshCw, Users, ShoppingCart, MessageSquare, Plus, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 
-type AdminTab = "products" | "orders" | "leads" | "users";
+type AdminTab = "products" | "pricing" | "pds" | "orders" | "leads" | "users";
 
 function getInitialAdminTab(): AdminTab {
   const tab = new URLSearchParams(window.location.search).get("tab");
-  return tab === "orders" || tab === "leads" || tab === "users" ? tab : "products";
+  return tab === "pricing" || tab === "pds" || tab === "orders" || tab === "leads" || tab === "users" ? tab : "products";
 }
 
 export default function Admin() {
@@ -39,6 +41,7 @@ export default function Admin() {
   const orders = ordersQuery.data || [];
   const leads = leadsQuery.data || [];
   const users2 = usersQuery.data || [];
+  const amplerProduct = products.find((product) => product.slug === "ampler");
 
   const handleDelete = (id: number) => {
     deleteMutation.mutate({ id }, {
@@ -62,6 +65,8 @@ export default function Admin() {
 
   const tabs = [
     { key: "products" as const, label: "Produtos", icon: <Package className="w-4 h-4" />, count: products.length },
+    { key: "pricing" as const, label: "Preços", icon: <DollarSign className="w-4 h-4" />, count: null },
+    { key: "pds" as const, label: "Importar PDS", icon: <FileUp className="w-4 h-4" />, count: null },
     { key: "orders" as const, label: "Pedidos", icon: <ShoppingCart className="w-4 h-4" />, count: orders.length },
     { key: "leads" as const, label: "Leads B2B", icon: <MessageSquare className="w-4 h-4" />, count: leads.length },
     { key: "users" as const, label: "Usuários", icon: <Users className="w-4 h-4" />, count: users2.length },
@@ -94,7 +99,7 @@ export default function Admin() {
                 >
                   {tab.icon}
                   {tab.label}
-                  <span className="text-xs opacity-60">({tab.count})</span>
+                  {tab.count !== null && <span className="text-xs opacity-60">({tab.count})</span>}
                 </button>
               ))}
             </div>
@@ -140,6 +145,14 @@ export default function Admin() {
                   </div>
                 ))}
               </div>
+            )}
+
+            {activeTab === "pricing" && (
+              amplerProduct ? <PricingManager productId={amplerProduct.id} /> : <p className="py-10 text-center text-muted-foreground">Carregando cadastro do Ampler...</p>
+            )}
+
+            {activeTab === "pds" && (
+              amplerProduct ? <PdsManager productId={amplerProduct.id} /> : <p className="py-10 text-center text-muted-foreground">Carregando cadastro do Ampler...</p>
             )}
 
             {/* Orders Tab */}

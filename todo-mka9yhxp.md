@@ -49,3 +49,36 @@
 - [x] Validar responsividade, SEO e fluxos no preview
 - [x] Salvar checkpoint publicável do site exclusivo do Ampler
 - [x] Publicar e validar o novo site no domínio disponível
+
+- [x] Definir política de homologação de preços brasileiros sem publicar valores não aprovados
+- [x] Mapear planos oficiais, moedas, periodicidade e fontes de preço do Ampler
+- [x] Criar tabela interna de custos, impostos, margem, câmbio e preço sugerido editáveis
+- [x] Implementar estados rascunho, em revisão, homologado e publicado para preços
+- [x] Garantir que somente preços homologados apareçam publicamente
+- [x] Localizar e validar cases oficiais do fabricante sem criar depoimentos fictícios
+- [x] Localizar e validar vídeos oficiais do Ampler e seus links de incorporação
+- [x] Criar estrutura de banco para cases, vídeos e fontes oficiais
+- [x] Criar estrutura de banco para uploads e versões de Product Decision Sheet
+- [x] Implementar upload seguro de PDS no painel administrativo
+- [x] Extrair e normalizar conteúdo de PDS DOCX/TXT sem execução de arquivos
+- [x] Gerar prévia de alterações com campos novos, alterados, removidos e pendentes
+- [x] Impedir duplicidades e preservar slug, histórico e compatibilidade das APIs
+- [x] Exigir aprovação administrativa antes de aplicar alterações do PDS
+- [x] Registrar auditoria de quem aprovou, quando e qual versão foi aplicada
+- [x] Exibir cases e vídeos oficiais na página do Ampler
+- [x] Atualizar painel administrativo com preços, mídia e histórico de PDS
+- [x] Criar testes automatizados de preços, upload, prévia, aprovação e rollback lógico
+- [x] Adicionar teste mocked do fluxo completo de análise PDS sem consumir quota externa
+- [x] Registrar tentativas reais com gpt-5-mini indisponível e ativar o fallback autorizado
+- [x] Executar migrações, Vitest, verificação TypeScript e build de produção
+- [x] Validar responsividade pública, proteção administrativa e fluxos do painel por testes integrados
+- [ ] Salvar checkpoint publicável dos novos recursos
+- [ ] Publicar e validar preços, mídia e automação de PDS no domínio final
+- [x] Integrar gpt-5-mini com schema estrito como enriquecimento opcional do PDS
+- [x] Manter aprovação humana obrigatória antes de aplicar qualquer PDS
+- [x] Suportar preço público oficial e tabela comercial interna no mesmo fluxo
+- [x] Restringir custos, impostos e margens ao painel administrativo
+- [x] Implementar parser estruturado de fallback para PDS quando o serviço de IA estiver indisponível
+- [x] Gerar prévia e permitir aprovação humana usando o resultado do fallback
+- [x] Manter reanálise opcional por gpt-5-mini sem bloquear o fluxo principal
+- [x] Validar ponta a ponta o PDS real pelo fallback e preservar a possibilidade de enriquecimento por IA

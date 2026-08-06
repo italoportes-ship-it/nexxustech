@@ -19,6 +19,8 @@ import {
   normalizeLeadEmail,
 } from "./leadAntiSpam";
 import { syncB2BLeadWithCRM } from "./leadSync";
+import { adminPricingRouter, productResourcesRouter } from "./routers/commercial";
+import { adminPdsRouter } from "./routers/pds";
 
 export const appRouter = router({
   system: systemRouter,
@@ -59,6 +61,8 @@ export const appRouter = router({
       return db.getProductById(input.id);
     }),
   }),
+
+  productResources: productResourcesRouter,
 
   // ===== CART =====
   cart: router({
@@ -333,6 +337,8 @@ Nunca invente preço em reais, economia percentual, SKU, SLA, case, avaliação 
 
   // ===== ADMIN =====
   admin: router({
+    pricing: adminPricingRouter,
+    pds: adminPdsRouter,
     products: router({
       list: adminProcedure.query(async () => {
         return db.getAllProductsIncludingInactive();

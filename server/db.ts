@@ -1,6 +1,6 @@
 import { eq, and, desc, gte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, categories, products, orders, orderItems, cartItems, b2bLeads, chatMessages, reviews, newsletterSubscribers } from "../drizzle/schema";
+import { InsertUser, users, categories, products, productPrices, productMedia, pdsImports, productVersions, pdsAuditLogs, orders, orderItems, cartItems, b2bLeads, chatMessages, reviews, newsletterSubscribers } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -330,8 +330,9 @@ export async function getChatHistory(sessionId: string, limit = 20) {
 // ===== ADMIN =====
 export async function createProduct(data: Omit<typeof products.$inferInsert, "id" | "createdAt" | "updatedAt">) {
   const db = await getDb();
-  if (!db) return;
-  await db.insert(products).values(data);
+  if (!db) throw new Error("Banco de dados indisponível");
+  const result = await db.insert(products).values(data);
+  return Number((result[0] as { insertId: number }).insertId);
 }
 
 export async function updateProduct(id: number, data: Partial<typeof products.$inferInsert>) {
@@ -394,4 +395,142 @@ export async function subscribeNewsletter(email: string) {
     if (err?.code === "ER_DUP_ENTRY") return false;
     throw err;
   }
+}
+
+// ===== PRODUCT PRICING =====
+export async function getPublishedProductPrices(productId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    id: productPrices.id,
+    planName: productPrices.planName,
+    minSeats: productPrices.minSeats,
+    maxSeats: productPrices.maxSeats,
+    billingPeriod: productPrices.billingPeriod,
+    approvedPriceBrl: productPrices.approvedPriceBrl,
+    effectiveFrom: productPrices.effectiveFrom,
+    effectiveTo: productPrices.effectiveTo,
+  }).from(productPrices).where(and(
+    eq(productPrices.productId, productId),
+    eq(productPrices.status, "published"),
+    eq(productPrices.isPublic, true),
+  )).orderBy(productPrices.minSeats);
+}
+
+export async function getAllProductPricesForAdmin(productId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(productPrices).where(eq(productPrices.productId, productId)).orderBy(productPrices.sourceType, productPrices.minSeats);
+}
+
+export async function getProductPriceById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(productPrices).where(eq(productPrices.id, id)).limit(1);
+  return result[0];
+}
+
+export async function createProductPrice(data: typeof productPrices.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível");
+  const result = await db.insert(productPrices).values(data);
+  return Number((result[0] as { insertId: number }).insertId);
+}
+
+export async function updateProductPrice(id: number, data: Partial<typeof productPrices.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível");
+  await db.update(productPrices).set(data).where(eq(productPrices.id, id));
+}
+
+// ===== OFFICIAL PRODUCT MEDIA =====
+export async function getPublishedProductMedia(productId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(productMedia).where(and(
+    eq(productMedia.productId, productId),
+    eq(productMedia.isOfficial, true),
+    eq(productMedia.isPublished, true),
+  )).orderBy(productMedia.sortOrder, productMedia.id);
+}
+
+export async function getAllProductMediaForAdmin(productId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(productMedia).where(eq(productMedia.productId, productId)).orderBy(productMedia.sortOrder, productMedia.id);
+}
+
+// ===== PDS IMPORTS & VERSION HISTORY =====
+export async function getProductBySlugIncludingInactive(slug: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
+  return result[0];
+}
+
+export async function createPdsImport(data: typeof pdsImports.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível");
+  const result = await db.insert(pdsImports).values(data);
+  return Number((result[0] as { insertId: number }).insertId);
+}
+
+export async function getPdsImportByHash(fileHash: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(pdsImports).where(eq(pdsImports.fileHash, fileHash)).orderBy(desc(pdsImports.createdAt)).limit(1);
+  return result[0];
+}
+
+export async function getPdsImportById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(pdsImports).where(eq(pdsImports.id, id)).limit(1);
+  return result[0];
+}
+
+export async function listPdsImports() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(pdsImports).orderBy(desc(pdsImports.createdAt));
+}
+
+export async function updatePdsImport(id: number, data: Partial<typeof pdsImports.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível");
+  await db.update(pdsImports).set(data).where(eq(pdsImports.id, id));
+}
+
+export async function createPdsAuditLog(data: typeof pdsAuditLogs.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível");
+  await db.insert(pdsAuditLogs).values(data);
+}
+
+export async function getPdsAuditLogs(pdsImportId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(pdsAuditLogs).where(eq(pdsAuditLogs.pdsImportId, pdsImportId)).orderBy(pdsAuditLogs.createdAt);
+}
+
+export async function createProductVersion(data: Omit<typeof productVersions.$inferInsert, "versionNumber">) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível");
+  const rows = await db.select({ maxVersion: sql<number>`COALESCE(MAX(${productVersions.versionNumber}), 0)` }).from(productVersions).where(eq(productVersions.productId, data.productId));
+  const versionNumber = Number(rows[0]?.maxVersion || 0) + 1;
+  await db.insert(productVersions).values({ ...data, versionNumber });
+  return versionNumber;
+}
+
+export async function listProductVersions(productId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(productVersions).where(eq(productVersions.productId, productId)).orderBy(desc(productVersions.versionNumber));
+}
+
+export async function getProductVersionById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(productVersions).where(eq(productVersions.id, id)).limit(1);
+  return result[0];
 }

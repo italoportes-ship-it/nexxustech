@@ -70,6 +70,116 @@ export type Product = typeof products.$inferSelect;
 export type InsertProduct = typeof products.$inferInsert;
 
 /**
+ * Public reference prices and confidential commercial pricing workflow.
+ */
+export const productPrices = mysqlTable("productPrices", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("productId").notNull(),
+  sourceType: mysqlEnum("sourceType", ["public", "internal"]).notNull(),
+  planName: varchar("planName", { length: 255 }).notNull(),
+  minSeats: int("minSeats").default(1).notNull(),
+  maxSeats: int("maxSeats"),
+  billingPeriod: mysqlEnum("billingPeriod", ["monthly", "annual", "custom"]).default("annual").notNull(),
+  currency: varchar("currency", { length: 3 }).notNull(),
+  sourceAmount: decimal("sourceAmount", { precision: 14, scale: 4 }).notNull(),
+  exchangeRate: decimal("exchangeRate", { precision: 14, scale: 6 }),
+  taxRate: decimal("taxRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  operationalCostRate: decimal("operationalCostRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  marginRate: decimal("marginRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  calculatedCostBrl: decimal("calculatedCostBrl", { precision: 14, scale: 2 }),
+  suggestedPriceBrl: decimal("suggestedPriceBrl", { precision: 14, scale: 2 }),
+  approvedPriceBrl: decimal("approvedPriceBrl", { precision: 14, scale: 2 }),
+  status: mysqlEnum("status", ["draft", "in_review", "approved", "published"]).default("draft").notNull(),
+  isPublic: boolean("isPublic").default(false).notNull(),
+  sourceLabel: varchar("sourceLabel", { length: 255 }),
+  sourceUrl: varchar("sourceUrl", { length: 1000 }),
+  effectiveFrom: timestamp("effectiveFrom"),
+  effectiveTo: timestamp("effectiveTo"),
+  approvedByUserId: int("approvedByUserId"),
+  approvedAt: timestamp("approvedAt"),
+  publishedAt: timestamp("publishedAt"),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ProductPrice = typeof productPrices.$inferSelect;
+export type InsertProductPrice = typeof productPrices.$inferInsert;
+
+/**
+ * Official customer stories and videos sourced from the manufacturer.
+ */
+export const productMedia = mysqlTable("productMedia", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("productId").notNull(),
+  mediaType: mysqlEnum("mediaType", ["case", "video"]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  summary: text("summary"),
+  customerName: varchar("customerName", { length: 255 }),
+  resultText: text("resultText"),
+  sourceUrl: varchar("sourceUrl", { length: 1000 }).notNull(),
+  embedUrl: varchar("embedUrl", { length: 1000 }),
+  imageUrl: varchar("imageUrl", { length: 1000 }),
+  isOfficial: boolean("isOfficial").default(true).notNull(),
+  isPublished: boolean("isPublished").default(true).notNull(),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ProductMedia = typeof productMedia.$inferSelect;
+
+/**
+ * Uploaded Product Decision Sheets and their human approval workflow.
+ */
+export const pdsImports = mysqlTable("pdsImports", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("productId"),
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  fileType: varchar("fileType", { length: 100 }).notNull(),
+  fileKey: varchar("fileKey", { length: 1000 }).notNull(),
+  fileUrl: varchar("fileUrl", { length: 1000 }).notNull(),
+  fileHash: varchar("fileHash", { length: 64 }).notNull(),
+  modelId: varchar("modelId", { length: 100 }),
+  status: mysqlEnum("status", ["uploaded", "analyzing", "review", "approved", "rejected", "applied", "failed"]).default("uploaded").notNull(),
+  extractedText: text("extractedText"),
+  parsedData: text("parsedData"),
+  changePreview: text("changePreview"),
+  warnings: text("warnings"),
+  errorMessage: text("errorMessage"),
+  createdByUserId: int("createdByUserId").notNull(),
+  reviewedByUserId: int("reviewedByUserId"),
+  approvedAt: timestamp("approvedAt"),
+  appliedAt: timestamp("appliedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PdsImport = typeof pdsImports.$inferSelect;
+
+/**
+ * Immutable product snapshots created whenever an approved PDS is applied.
+ */
+export const productVersions = mysqlTable("productVersions", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("productId").notNull(),
+  pdsImportId: int("pdsImportId"),
+  versionNumber: int("versionNumber").notNull(),
+  snapshot: text("snapshot").notNull(),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const pdsAuditLogs = mysqlTable("pdsAuditLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  pdsImportId: int("pdsImportId").notNull(),
+  action: mysqlEnum("action", ["upload", "analyze", "approve", "reject", "apply", "fail"]).notNull(),
+  actorUserId: int("actorUserId").notNull(),
+  details: text("details"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+/**
  * Orders
  */
 export const orders = mysqlTable("orders", {

@@ -15,7 +15,9 @@ import {
   Layers3,
   Mail,
   MonitorCheck,
+  PlayCircle,
   Presentation,
+  Quote,
   ScanSearch,
   Sparkles,
 } from "lucide-react";
@@ -43,6 +45,8 @@ export default function ProductDetail() {
   const params = useParams<{ slug: string }>();
   const productQuery = trpc.products.bySlug.useQuery({ slug: params.slug || "" });
   const product = productQuery.data;
+  const mediaQuery = trpc.productResources.media.useQuery({ productId: product?.id || 1 }, { enabled: Boolean(product) });
+  const pricesQuery = trpc.productResources.publishedPrices.useQuery({ productId: product?.id || 1 }, { enabled: Boolean(product) });
 
   if (!product && productQuery.isLoading) {
     return (
@@ -73,6 +77,11 @@ export default function ProductDetail() {
   const features = (product.features || "").split(",").filter(Boolean);
   const faqs = parseFaqs(product.faqs);
   const image = product.imageUrl || FALLBACK_IMAGE;
+  const media = mediaQuery.data || [];
+  const officialCases = media.filter((item) => item.mediaType === "case");
+  const officialVideos = media.filter((item) => item.mediaType === "video" && item.embedUrl);
+  const publishedPrices = pricesQuery.data || [];
+  const firstPublishedPrice = publishedPrices.find((price) => price.approvedPriceBrl);
   const schema = [
     {
       "@context": "https://schema.org",
@@ -86,9 +95,9 @@ export default function ProductDetail() {
       author: { "@type": "Organization", name: product.manufacturer || "Ampler" },
       offers: {
         "@type": "Offer",
-        price: "0",
+        price: firstPublishedPrice?.approvedPriceBrl || "0",
         priceCurrency: "BRL",
-        description: "Preço sob consulta conforme módulos e quantidade de usuários.",
+        description: firstPublishedPrice ? "Preço homologado pela NexxusTECH." : "Preço sob consulta conforme módulos e quantidade de usuários.",
         availability: "https://schema.org/InStock",
       },
     },
@@ -212,6 +221,77 @@ export default function ProductDetail() {
             </div>
           </div>
         </section>
+
+        {publishedPrices.length > 0 && (
+          <section className="py-20 md:py-24">
+            <div className="container">
+              <div className="mx-auto max-w-3xl text-center">
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#54d6c7]">Valores homologados</p>
+                <h2 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-white md:text-5xl">Planos publicados para contratação no Brasil.</h2>
+                <p className="mt-4 text-sm text-muted-foreground">Os valores abaixo foram revisados e aprovados administrativamente. Custos, impostos e margens permanecem restritos.</p>
+              </div>
+              <div className="mx-auto mt-12 grid max-w-5xl gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {publishedPrices.map((price) => (
+                  <div key={price.id} className="rounded-3xl border border-[#54d6c7]/15 bg-[#54d6c7]/[0.035] p-6">
+                    <p className="text-sm font-semibold text-white">{price.planName}</p>
+                    <p className="mt-5 text-3xl font-semibold text-white">R$ {Number(price.approvedPriceBrl).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
+                    <p className="mt-2 text-xs text-muted-foreground">{price.billingPeriod === "monthly" ? "por mês" : price.billingPeriod === "annual" ? "por ano" : "condição personalizada"} · a partir de {price.minSeats} assento(s)</p>
+                    <Link href="/b2b?produto=ampler" className="mt-6 inline-flex text-sm font-semibold text-[#54d6c7]">Solicitar proposta <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {officialCases.length > 0 && (
+          <section className="py-20 md:py-28">
+            <div className="container">
+              <div className="mx-auto max-w-3xl text-center">
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#58a9ff]">Histórias oficiais de clientes</p>
+                <h2 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-white md:text-5xl">Resultados publicados pelo fabricante.</h2>
+                <p className="mt-4 text-sm text-muted-foreground">Cada resumo abaixo aponta para o case completo no site oficial do Ampler.</p>
+              </div>
+              <div className="mt-12 grid gap-5 md:grid-cols-2">
+                {officialCases.map((item) => (
+                  <a key={item.id} href={item.sourceUrl} target="_blank" rel="noreferrer" className="group rounded-3xl border border-white/7 bg-white/[0.025] p-6 transition-colors hover:border-[#58a9ff]/30">
+                    <Quote className="h-6 w-6 text-[#58a9ff]" />
+                    <p className="mt-5 text-xs font-semibold uppercase tracking-[0.14em] text-[#58a9ff]">{item.customerName}</p>
+                    <h3 className="mt-2 text-xl font-semibold text-white">{item.title}</h3>
+                    <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{item.summary}</p>
+                    {item.resultText && <p className="mt-4 text-sm font-medium leading-relaxed text-foreground/80">{item.resultText}</p>}
+                    <span className="mt-6 inline-flex items-center text-sm font-semibold text-[#58a9ff]">Ler case oficial <ExternalLink className="ml-2 h-4 w-4" /></span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {officialVideos.length > 0 && (
+          <section className="bg-secondary py-20 md:py-28">
+            <div className="container">
+              <div className="flex items-center gap-3"><PlayCircle className="h-6 w-6 text-[#ec70b9]" /><p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#ec70b9]">Vídeos oficiais</p></div>
+              <h2 className="mt-4 max-w-3xl text-3xl font-semibold tracking-[-0.03em] text-white md:text-5xl">Veja o Ampler em ação.</h2>
+              <div className="mt-12 grid gap-6 lg:grid-cols-2">
+                {officialVideos.map((item) => (
+                  <article key={item.id} className="overflow-hidden rounded-3xl border border-white/8 bg-background/60">
+                    <iframe
+                      src={item.embedUrl || undefined}
+                      title={item.title}
+                      loading="lazy"
+                      className="aspect-video w-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allowFullScreen
+                    />
+                    <div className="p-5"><h3 className="font-semibold text-white">{item.title}</h3><p className="mt-2 text-sm text-muted-foreground">{item.summary}</p></div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {faqs.length > 0 && (
           <section className="py-20 md:py-28">
