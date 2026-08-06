@@ -95,7 +95,7 @@
 - [x] Calcular e apresentar custo BRL, preço sugerido e preço final por licença
 - [x] Manter o primeiro preço em rascunho até homologação explícita do admin, sem publicação automática
 - [x] Tentar novamente o enriquecimento opcional por gpt-5-mini — serviço continuou retornando HTTP 412; fallback permanece ativo
-- [ ] Executar testes, salvar checkpoint e validar produção após as alterações
+- [x] Executar testes, salvar checkpoint e validar produção após as alterações
 - [x] Criar a base administrativa de formação de preço exclusiva para role admin
 - [x] Incluir custo unitário, período, quantidade, moeda e câmbio editáveis
 - [x] Incluir custo negociado, desconto contratual e custo total do fabricante
