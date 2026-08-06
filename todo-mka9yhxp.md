@@ -86,3 +86,27 @@
 - [x] Gerar prévia e permitir aprovação humana usando o resultado do fallback
 - [x] Manter reanálise opcional por gpt-5-mini sem bloquear o fluxo principal
 - [x] Validar ponta a ponta o PDS real pelo fallback e preservar a possibilidade de enriquecimento por IA
+- [x] Classificar as 11 diferenças do PDS real por segurança e qualidade da fonte
+- [x] Selecionar somente campos do PDS que melhoram o cadastro oficial atual
+- [x] Rejeitar ou preservar campos em que o conteúdo existente é superior ou mais confiável
+- [x] Aplicar seletivamente os campos aprováveis com snapshot e auditoria — nenhum campo aprovável; PDS rejeitado sem aplicação
+- [x] Definir plano, quantidade e base de custo do primeiro preço brasileiro
+- [x] Transferir a confirmação de câmbio, impostos, custos e margem para o workflow exclusivo da Administração
+- [x] Calcular e apresentar custo BRL, preço sugerido e preço final por licença
+- [x] Manter o primeiro preço em rascunho até homologação explícita do admin, sem publicação automática
+- [x] Tentar novamente o enriquecimento opcional por gpt-5-mini — serviço continuou retornando HTTP 412; fallback permanece ativo
+- [ ] Executar testes, salvar checkpoint e validar produção após as alterações
+- [x] Criar a base administrativa de formação de preço exclusiva para role admin
+- [x] Incluir custo unitário, período, quantidade, moeda e câmbio editáveis
+- [x] Incluir custo negociado, desconto contratual e custo total do fabricante
+- [x] Incluir flag de retenção e alíquotas editáveis de IRRF e demais impostos
+- [x] Incluir custos operacionais, financeiros e adicionais editáveis
+- [x] Calcular custo total BRL, custo por licença, margem de contribuição e markup informativo
+- [x] Permitir margem mínima, margem sugerida e preço final manual
+- [x] Exibir simulação em tempo real sem gravar ou publicar automaticamente
+- [x] Salvar cenários como rascunho e registrar aprovador e datas
+- [x] Manter estados rascunho, revisão, homologado, publicado e retirado
+- [x] Publicar somente preço final e condições comerciais seguras ao consumidor
+- [x] Impedir que custo, impostos, margem e markup apareçam em APIs públicas
+- [x] Adicionar testes unitários e integrados da base Administração
+- [x] Validar o painel Administração em desktop e mobile

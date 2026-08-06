@@ -107,6 +107,74 @@ export type ProductPrice = typeof productPrices.$inferSelect;
 export type InsertProductPrice = typeof productPrices.$inferInsert;
 
 /**
+ * Confidential pricing administration scenarios. This table is admin-only;
+ * the public API receives only the approved final price copied to productPrices.
+ */
+export const pricingAdministration = mysqlTable("pricingAdministration", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("productId").notNull(),
+  scenarioName: varchar("scenarioName", { length: 255 }).notNull(),
+  planName: varchar("planName", { length: 255 }).notNull(),
+  sourceType: mysqlEnum("sourceType", ["public", "internal"]).default("internal").notNull(),
+  costPeriod: mysqlEnum("costPeriod", ["monthly", "annual", "custom"]).default("annual").notNull(),
+  sourceCurrency: varchar("sourceCurrency", { length: 3 }).default("USD").notNull(),
+  listUnitCost: decimal("listUnitCost", { precision: 14, scale: 4 }).notNull(),
+  negotiatedUnitCost: decimal("negotiatedUnitCost", { precision: 14, scale: 4 }),
+  useNegotiatedCost: boolean("useNegotiatedCost").default(false).notNull(),
+  quantity: int("quantity").default(1).notNull(),
+  periodMonths: int("periodMonths").default(12).notNull(),
+  dealDiscountRate: decimal("dealDiscountRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  exchangeRate: decimal("exchangeRate", { precision: 14, scale: 6 }).notNull(),
+  exchangeSpreadRate: decimal("exchangeSpreadRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  manufacturerAbsorbsIrrf: boolean("manufacturerAbsorbsIrrf").default(true).notNull(),
+  irrfRate: decimal("irrfRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  cideRate: decimal("cideRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  pisRate: decimal("pisRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  cofinsRate: decimal("cofinsRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  issRate: decimal("issRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  iofRate: decimal("iofRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  otherTaxRate: decimal("otherTaxRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  financialCostRate: decimal("financialCostRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  operationalCostRate: decimal("operationalCostRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  contingencyRate: decimal("contingencyRate", { precision: 8, scale: 4 }).default("0").notNull(),
+  minimumMarginRate: decimal("minimumMarginRate", { precision: 8, scale: 4 }).default("25").notNull(),
+  targetMarginRate: decimal("targetMarginRate", { precision: 8, scale: 4 }).default("30").notNull(),
+  manualSalePriceBrl: decimal("manualSalePriceBrl", { precision: 14, scale: 2 }),
+  grossForeignCost: decimal("grossForeignCost", { precision: 14, scale: 2 }),
+  netForeignCost: decimal("netForeignCost", { precision: 14, scale: 2 }),
+  baseCostBrl: decimal("baseCostBrl", { precision: 14, scale: 2 }),
+  taxesBrl: decimal("taxesBrl", { precision: 14, scale: 2 }),
+  totalCostBrl: decimal("totalCostBrl", { precision: 14, scale: 2 }),
+  minimumPriceBrl: decimal("minimumPriceBrl", { precision: 14, scale: 2 }),
+  suggestedPriceBrl: decimal("suggestedPriceBrl", { precision: 14, scale: 2 }),
+  finalSalePriceBrl: decimal("finalSalePriceBrl", { precision: 14, scale: 2 }),
+  unitSalePriceBrl: decimal("unitSalePriceBrl", { precision: 14, scale: 2 }),
+  contributionBrl: decimal("contributionBrl", { precision: 14, scale: 2 }),
+  contributionRate: decimal("contributionRate", { precision: 8, scale: 4 }),
+  markupRate: decimal("markupRate", { precision: 8, scale: 4 }),
+  status: mysqlEnum("status", ["draft", "in_review", "approved", "published", "withdrawn"]).default("draft").notNull(),
+  productPriceId: int("productPriceId"),
+  publicPlanName: varchar("publicPlanName", { length: 255 }),
+  publicBillingPeriod: mysqlEnum("publicBillingPeriod", ["monthly", "annual", "custom"]).default("annual").notNull(),
+  publicMinSeats: int("publicMinSeats").default(1).notNull(),
+  publicMaxSeats: int("publicMaxSeats"),
+  publicDescription: text("publicDescription"),
+  sourceLabel: varchar("sourceLabel", { length: 255 }),
+  sourceUrl: varchar("sourceUrl", { length: 1000 }),
+  notes: text("notes"),
+  createdByUserId: int("createdByUserId").notNull(),
+  approvedByUserId: int("approvedByUserId"),
+  approvedAt: timestamp("approvedAt"),
+  publishedAt: timestamp("publishedAt"),
+  withdrawnAt: timestamp("withdrawnAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PricingAdministration = typeof pricingAdministration.$inferSelect;
+export type InsertPricingAdministration = typeof pricingAdministration.$inferInsert;
+
+/**
  * Official customer stories and videos sourced from the manufacturer.
  */
 export const productMedia = mysqlTable("productMedia", {

@@ -1,6 +1,6 @@
 import { eq, and, desc, gte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, categories, products, productPrices, productMedia, pdsImports, productVersions, pdsAuditLogs, orders, orderItems, cartItems, b2bLeads, chatMessages, reviews, newsletterSubscribers } from "../drizzle/schema";
+import { InsertUser, users, categories, products, productPrices, pricingAdministration, productMedia, pdsImports, productVersions, pdsAuditLogs, orders, orderItems, cartItems, b2bLeads, chatMessages, reviews, newsletterSubscribers } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -533,4 +533,33 @@ export async function getProductVersionById(id: number) {
   if (!db) return undefined;
   const result = await db.select().from(productVersions).where(eq(productVersions.id, id)).limit(1);
   return result[0];
+}
+
+// ===== PRICING ADMINISTRATION =====
+export async function listPricingAdministration(productId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const query = db.select().from(pricingAdministration);
+  if (productId) return query.where(eq(pricingAdministration.productId, productId)).orderBy(desc(pricingAdministration.updatedAt));
+  return query.orderBy(desc(pricingAdministration.updatedAt));
+}
+
+export async function getPricingAdministrationById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(pricingAdministration).where(eq(pricingAdministration.id, id)).limit(1);
+  return result[0];
+}
+
+export async function createPricingAdministration(data: typeof pricingAdministration.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível");
+  const result = await db.insert(pricingAdministration).values(data);
+  return Number((result[0] as { insertId: number }).insertId);
+}
+
+export async function updatePricingAdministration(id: number, data: Partial<typeof pricingAdministration.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Banco de dados indisponível");
+  await db.update(pricingAdministration).set(data).where(eq(pricingAdministration.id, id));
 }

@@ -21,6 +21,7 @@ import {
 import { syncB2BLeadWithCRM } from "./leadSync";
 import { adminPricingRouter, productResourcesRouter } from "./routers/commercial";
 import { adminPdsRouter } from "./routers/pds";
+import { adminAdministrationRouter } from "./routers/administration";
 
 export const appRouter = router({
   system: systemRouter,
@@ -337,6 +338,7 @@ Nunca invente preço em reais, economia percentual, SKU, SLA, case, avaliação 
 
   // ===== ADMIN =====
   admin: router({
+    administration: adminAdministrationRouter,
     pricing: adminPricingRouter,
     pds: adminPdsRouter,
     products: router({

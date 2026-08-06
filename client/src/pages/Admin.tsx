@@ -1,19 +1,20 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import PricingManager from "@/components/admin/PricingManager";
+import AdministrationManager from "@/components/admin/AdministrationManager";
 import PdsManager from "@/components/admin/PdsManager";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { AlertTriangle, CheckCircle2, Clock3, DollarSign, FileUp, Package, RefreshCw, Users, ShoppingCart, MessageSquare, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock3, FileUp, Package, RefreshCw, SlidersHorizontal, Users, ShoppingCart, MessageSquare, Plus, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 
-type AdminTab = "products" | "pricing" | "pds" | "orders" | "leads" | "users";
+type AdminTab = "products" | "administration" | "pds" | "orders" | "leads" | "users";
 
 function getInitialAdminTab(): AdminTab {
   const tab = new URLSearchParams(window.location.search).get("tab");
-  return tab === "pricing" || tab === "pds" || tab === "orders" || tab === "leads" || tab === "users" ? tab : "products";
+  if (tab === "pricing") return "administration";
+  return tab === "administration" || tab === "pds" || tab === "orders" || tab === "leads" || tab === "users" ? tab : "products";
 }
 
 export default function Admin() {
@@ -65,7 +66,7 @@ export default function Admin() {
 
   const tabs = [
     { key: "products" as const, label: "Produtos", icon: <Package className="w-4 h-4" />, count: products.length },
-    { key: "pricing" as const, label: "Preços", icon: <DollarSign className="w-4 h-4" />, count: null },
+    { key: "administration" as const, label: "Administração", icon: <SlidersHorizontal className="w-4 h-4" />, count: null },
     { key: "pds" as const, label: "Importar PDS", icon: <FileUp className="w-4 h-4" />, count: null },
     { key: "orders" as const, label: "Pedidos", icon: <ShoppingCart className="w-4 h-4" />, count: orders.length },
     { key: "leads" as const, label: "Leads B2B", icon: <MessageSquare className="w-4 h-4" />, count: leads.length },
@@ -147,8 +148,8 @@ export default function Admin() {
               </div>
             )}
 
-            {activeTab === "pricing" && (
-              amplerProduct ? <PricingManager productId={amplerProduct.id} /> : <p className="py-10 text-center text-muted-foreground">Carregando cadastro do Ampler...</p>
+            {activeTab === "administration" && (
+              amplerProduct ? <AdministrationManager productId={amplerProduct.id} /> : <p className="py-10 text-center text-muted-foreground">Carregando cadastro do Ampler...</p>
             )}
 
             {activeTab === "pds" && (
