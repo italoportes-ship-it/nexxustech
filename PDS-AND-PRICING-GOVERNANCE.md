@@ -56,3 +56,11 @@ Foram cadastrados quatro cases oficiais (Ørsted, Oterra, KLM e Velliv) e dois v
 A página `/produto/ampler` carregou os quatro cases oficiais (Ørsted, Oterra, KLM e Velliv) e os dois vídeos do canal oficial. A consulta pública de preços retornou zero registros porque nenhuma faixa brasileira está homologada e publicada; portanto, nenhum custo interno ou valor preliminar apareceu no frontend. A visualização móvel em 390 × 844 manteve cards e vídeos em uma coluna, sem overflow horizontal.
 
 O painel administrativo exige autenticação e papel `admin`; uma sessão anônima recebeu “Acesso restrito a administradores”, confirmando que custos, margens, câmbio, PDS e auditoria não são públicos.
+
+## Validação no ambiente publicado
+
+Uma sessão temporária assinada pelo próprio projeto validou as rotas administrativas em `https://nexxustech.one`: 20 linhas de preço foram acessadas apenas como administrador; o PDS real foi localizado em estado `review`, com modelo `structured-fallback`, prévia disponível e quatro eventos de auditoria. Um preço temporário percorreu rascunho, revisão, homologação, publicação e retirada. Durante a publicação, a API pública expôs somente plano, assentos, periodicidade e preço final; custo de origem, câmbio, impostos e margem não apareceram. O registro temporário foi removido e não restou nenhum preço público.
+
+O bundle administrativo publicado contém as interfaces **Importar Product Decision Sheet**, **Cálculo brasileiro**, **Enriquecer prévia com IA** e **Aprovar e aplicar**. A página pública em `https://nexxustech.one/produto/ampler` exibe os quatro cases e dois vídeos oficiais e mantém o preço sob consulta, pois nenhuma faixa brasileira real foi homologada.
+
+A proteção seletiva também foi exercitada no domínio final: uma tentativa de aprovação com zero campos foi bloqueada pela validação; o PDS permaneceu em `review` e nenhuma versão associada ao import foi criada. Assim, o conteúdo atual do Ampler continua inalterado até que um administrador selecione campos e confirme conscientemente a aplicação.

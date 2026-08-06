@@ -72,8 +72,12 @@
 - [x] Registrar tentativas reais com gpt-5-mini indisponível e ativar o fallback autorizado
 - [x] Executar migrações, Vitest, verificação TypeScript e build de produção
 - [x] Validar responsividade pública, proteção administrativa e fluxos do painel por testes integrados
-- [ ] Salvar checkpoint publicável dos novos recursos
-- [ ] Publicar e validar preços, mídia e automação de PDS no domínio final
+- [x] Salvar checkpoint publicável dos novos recursos
+- [x] Publicar e validar preços, mídia e automação de PDS no domínio final
+- [x] Validar no domínio publicado o painel autenticado de preços e PDS
+- [x] Confirmar no domínio publicado a prévia real em fallback e a aprovação seletiva sem aplicar campos
+- [ ] Documentar no painel que gpt-5-mini está opcional e o fallback estruturado é o modo operacional atual
+- [ ] Validar no bundle publicado o aviso persistente sobre fallback e IA opcional
 - [x] Integrar gpt-5-mini com schema estrito como enriquecimento opcional do PDS
 - [x] Manter aprovação humana obrigatória antes de aplicar qualquer PDS
 - [x] Suportar preço público oficial e tabela comercial interna no mesmo fluxo

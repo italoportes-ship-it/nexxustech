@@ -159,6 +159,10 @@ export default function PdsManager({ productId }: PdsManagerProps) {
         </div>
       </div>
 
+      <div className="rounded-2xl border border-[#54d6c7]/20 bg-[#54d6c7]/[0.045] p-4 text-sm leading-relaxed text-foreground/75">
+        <strong className="text-[#54d6c7]">Modo operacional atual:</strong> o parser estruturado gera a prévia imediatamente e mantém a aprovação humana obrigatória. O <strong>gpt-5-mini é opcional</strong>; use <strong>Enriquecer prévia com IA</strong> quando quiser uma segunda leitura e o serviço estiver disponível. A indisponibilidade da IA nunca aplica nem bloqueia alterações.
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="space-y-3">
           <div className="flex items-center justify-between"><h3 className="font-semibold text-white">Histórico de imports</h3><span className="text-xs text-muted-foreground">{imports.length} registro(s)</span></div>
