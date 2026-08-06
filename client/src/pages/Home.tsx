@@ -1,409 +1,327 @@
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { trpc } from "@/lib/trpc";
+import Navbar from "@/components/Navbar";
+import Seo from "@/components/Seo";
 import { Link } from "wouter";
-import { Shield, Code, Palette, BarChart3, ArrowRight, Zap, Globe, Award } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
-import AnimatedCounter from "@/components/AnimatedCounter";
-import Testimonials from "@/components/Testimonials";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  BarChart3,
+  BookOpenCheck,
+  BriefcaseBusiness,
+  Building2,
+  Check,
+  FileSpreadsheet,
+  FileText,
+  Layers3,
+  Mail,
+  Presentation,
+  ScanSearch,
+  Sparkles,
+  Users,
+} from "lucide-react";
 
-const categoryIcons: Record<string, React.ReactNode> = {
-  Shield: <Shield className="w-6 h-6" />,
-  Code: <Code className="w-6 h-6" />,
-  Palette: <Palette className="w-6 h-6" />,
-  BarChart3: <BarChart3 className="w-6 h-6" />,
-};
+const HERO_IMAGE = "/manus-storage/ampler-hero_2ba32fe5.png";
+const AMPLER_LOGO = "/manus-storage/ampler-logo-official_40fe246e.webp";
 
-// Reusable animation variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
+const fadeUp = {
+  hidden: { opacity: 0, y: 28, filter: "blur(8px)" },
   visible: { opacity: 1, y: 0, filter: "blur(0px)" },
 };
 
-const fadeInScale = {
-  hidden: { opacity: 0, scale: 0.92, filter: "blur(8px)" },
-  visible: { opacity: 1, scale: 1, filter: "blur(0px)" },
-};
+const officeApps = [
+  { icon: Presentation, name: "PowerPoint", detail: "Slides, gráficos e consistência" },
+  { icon: FileSpreadsheet, name: "Excel", detail: "Modelos e produtividade" },
+  { icon: FileText, name: "Word", detail: "Documentos padronizados" },
+  { icon: Mail, name: "Outlook", detail: "Assinaturas e organização" },
+];
 
-const staggerContainer = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1,
-    },
+const capabilities = [
+  {
+    icon: Sparkles,
+    title: "150+ ferramentas para PowerPoint",
+    description: "Automatize formatação, alinhamento, verificações de consistência e tarefas recorrentes.",
   },
-};
+  {
+    icon: Layers3,
+    title: "Biblioteca corporativa",
+    description: "Centralize slides, formas, layouts, imagens e ícones para toda a organização.",
+  },
+  {
+    icon: ScanSearch,
+    title: "Scan & Fix",
+    description: "Identifique inconsistências e prepare apresentações com padrão profissional.",
+  },
+  {
+    icon: BarChart3,
+    title: "Ampler Charts",
+    description: "Crie gráficos e visualizações, incluindo Gantt, com layouts reutilizáveis.",
+  },
+  {
+    icon: BookOpenCheck,
+    title: "Agenda e Storyboard",
+    description: "Estruture a narrativa e atualize páginas de agenda com menos trabalho manual.",
+  },
+  {
+    icon: Building2,
+    title: "Padrões compartilhados",
+    description: "Distribua templates e conteúdo aprovado para manter a identidade visual da empresa.",
+  },
+];
 
-const staggerItem = {
-  hidden: { opacity: 0, y: 30, filter: "blur(6px)" },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.6, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] },
-  },
-};
+const audiences = [
+  "Consultoria",
+  "Finanças",
+  "Estratégia",
+  "Vendas",
+  "PMO",
+  "Times corporativos",
+];
 
 export default function Home() {
-  const categoriesQuery = trpc.categories.list.useQuery();
-  const productsQuery = trpc.products.list.useQuery();
-  const categories = categoriesQuery.data || [];
-  const products = (productsQuery.data || []).slice(0, 6);
-
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"] as any,
-  });
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
-  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, 60]);
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        name: "NexxusTECH",
+        url: `${window.location.origin}/`,
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: "Ampler",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Windows / Microsoft Office",
+        description:
+          "Plataforma de produtividade para PowerPoint, Excel, Word e Outlook com biblioteca corporativa, gráficos e recursos de consistência.",
+        url: `${window.location.origin}/produto/ampler`,
+        image: new URL(HERO_IMAGE, window.location.origin).toString(),
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "BRL",
+          description: "Preço sob consulta conforme módulos e quantidade de usuários.",
+          availability: "https://schema.org/InStock",
+        },
+      },
+    ],
+  };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
+      <Seo
+        title="Ampler para Microsoft Office | Produtividade e Consistência | NexxusTECH"
+        description="Conheça o Ampler para PowerPoint, Excel, Word e Outlook. Automatize apresentações, padronize conteúdos e solicite uma demonstração com a NexxusTECH."
+        canonicalPath="/"
+        image={HERO_IMAGE}
+        keywords="Ampler, Ampler PowerPoint, produtividade Microsoft Office, add-in PowerPoint, gráficos PowerPoint, biblioteca de slides, Scan & Fix"
+        schema={schema}
+      />
       <Navbar />
 
-      {/* Hero Section - Apple Style with parallax */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden pt-14">
-        {/* Background gradient */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background dark:from-[#0a0a0a] dark:via-[#1D1D1F] dark:to-[#1D1D1F]" />
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#0071E3]/10 rounded-full blur-[120px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#0071E3]/5 rounded-full blur-[80px]" />
-        </div>
+      <main>
+        <section className="relative overflow-hidden pt-28 pb-20 md:pt-36 md:pb-28">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(0,113,227,0.20),transparent_34%),radial-gradient(circle_at_30%_70%,rgba(236,72,153,0.10),transparent_28%)]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
 
-        <motion.div
-          style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
-          className="container relative z-10 text-center"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 40, filter: "blur(12px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
-            className="max-w-4xl mx-auto"
-          >
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-[#0071E3] text-sm font-medium tracking-wide uppercase mb-6"
-            >
-              Plataforma Premium de Tecnologia
-            </motion.p>
-            <motion.h1
-              initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 0.8, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
-              className="text-display text-foreground mb-6"
-            >
-              Softwares e cursos
-              <br />
-              <span className="bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">
-                que transformam negócios.
-              </span>
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.5 }}
-              className="text-body-large text-muted-foreground max-w-2xl mx-auto mb-10"
-            >
-              Descubra as melhores soluções em infraestrutura, desenvolvimento, design e análise de dados. Para profissionais e empresas que exigem excelência.
-            </motion.p>
+          <div className="container relative z-10 grid items-center gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
             >
-              <Link href="/softwares">
-                <span className="apple-btn apple-btn-primary text-base px-8 py-3.5">
-                  Explorar Soluções
+              <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 backdrop-blur-xl">
+                <span className="h-2 w-2 rounded-full bg-[#54d6c7] shadow-[0_0_18px_rgba(84,214,199,0.75)]" />
+                <span className="text-xs font-medium uppercase tracking-[0.18em] text-foreground/70">
+                  Ampler para Microsoft Office
                 </span>
-              </Link>
-              <Link href="/b2b">
-                <span className="apple-btn apple-btn-secondary text-base text-[#0071E3]">
-                  Soluções Corporativas <ArrowRight className="w-4 h-4 inline ml-1" />
+              </div>
+
+              <img src={AMPLER_LOGO} alt="Ampler" className="mb-8 h-auto w-40 md:w-52" />
+
+              <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl md:text-6xl lg:text-[4.6rem] lg:leading-[0.98]">
+                Menos formatação.
+                <span className="mt-2 block bg-gradient-to-r from-[#60d7ce] via-[#58a9ff] to-[#ec70b9] bg-clip-text text-transparent">
+                  Mais trabalho que gera valor.
                 </span>
-              </Link>
+              </h1>
+
+              <p className="mt-7 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+                Crie apresentações, planilhas e documentos profissionais com ferramentas inteligentes,
+                biblioteca corporativa e padrões que acompanham toda a organização.
+              </p>
+
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                <Link href="/b2b?produto=ampler" className="apple-btn apple-btn-primary justify-center px-7 py-3.5 text-base">
+                  Solicitar demonstração <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+                <Link href="/produto/ampler" className="apple-btn apple-btn-secondary justify-center px-7 py-3.5 text-base">
+                  Explorar recursos
+                </Link>
+              </div>
+
+              <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-foreground/55">
+                <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#54d6c7]" /> Teste oficial de 30 dias</span>
+                <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#54d6c7]" /> Office 2007–2021 e Microsoft 365</span>
+              </div>
             </motion.div>
-          </motion.div>
-        </motion.div>
-      </section>
 
-      {/* Categories - Bento Grid with staggered scroll animations */}
-      <section className="py-16 md:py-24 bg-secondary">
-        <div className="container">
-          <motion.div
-            variants={fadeInUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
-            className="text-center mb-10 md:mb-16"
-          >
-            <h2 className="text-headline text-foreground mb-4">
-              Nossas Categorias
-            </h2>
-            <p className="text-body-large text-muted-foreground max-w-xl mx-auto">
-              Soluções organizadas para atender cada necessidade do seu negócio.
-            </p>
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, x: 24 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              transition={{ duration: 0.85, delay: 0.1, ease: [0.23, 1, 0.32, 1] }}
+              className="relative"
+            >
+              <div className="absolute -inset-8 rounded-[3rem] bg-[#0071E3]/10 blur-3xl" />
+              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] p-2 shadow-2xl shadow-black/30 backdrop-blur-xl">
+                <img
+                  src={HERO_IMAGE}
+                  alt="Composição visual de apresentações, gráficos e documentos representando a produtividade do Ampler"
+                  className="aspect-video w-full rounded-[1.55rem] object-cover"
+                />
+              </div>
+            </motion.div>
+          </div>
+        </section>
 
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            {categories.map((cat) => (
-              <motion.div
-                key={cat.id}
-                variants={staggerItem}
-              >
-                <Link href={`/categoria/${cat.slug}`}>
-                  <div className="bento-card group cursor-pointer h-full">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-[#0071E3]/10 flex items-center justify-center text-[#0071E3] group-hover:bg-[#0071E3]/20 transition-colors">
-                        {categoryIcons[cat.icon || "Shield"]}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-[#0071E3] transition-colors">
-                          {cat.name}
-                        </h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {cat.description}
-                        </p>
-                        <span className="inline-flex items-center gap-1 text-sm text-[#0071E3] mt-4 font-medium">
-                          Explorar <ArrowRight className="w-3.5 h-3.5" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Featured Products with staggered scroll animations */}
-      <section className="py-16 md:py-24 bg-background">
-        <div className="container">
-          <motion.div
-            variants={fadeInUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
-            className="text-center mb-10 md:mb-16"
-          >
-            <h2 className="text-headline text-foreground mb-4">
-              Soluções em Destaque
-            </h2>
-            <p className="text-body-large text-muted-foreground max-w-xl mx-auto">
-              Os softwares mais procurados por profissionais e empresas.
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {products.map((product) => (
-              <motion.div
-                key={product.id}
-                variants={fadeInScale}
-                transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-              >
-                <Link href={`/produto/${product.slug}`}>
-                  <div className="bento-card group cursor-pointer h-full flex flex-col">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                          product.type === "course"
-                            ? "bg-green-500/10 text-green-400"
-                            : "bg-[#0071E3]/10 text-[#0071E3]"
-                        }`}>
-                          {product.type === "course" ? "Curso" : "Software"}
-                        </span>
-                      </div>
-                      <h3 className="text-base font-semibold text-foreground mb-2 group-hover:text-[#0071E3] transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
-                        {product.shortDescription}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/5">
-                      <span className="text-lg font-bold text-foreground">
-                        R$ {parseFloat(product.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                      </span>
-                      <span className="text-sm text-[#0071E3] font-medium flex items-center gap-1">
-                        Ver mais <ArrowRight className="w-3.5 h-3.5" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            variants={fadeInUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-center mt-12"
-          >
-            <Link href="/softwares">
-              <span className="apple-btn apple-btn-primary">
-                Ver Todos os Produtos
-              </span>
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Trust Section with staggered animations */}
-      <section className="py-16 md:py-24 bg-secondary">
-        <div className="container">
-          <motion.div
-            variants={fadeInUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
-            className="text-center mb-10 md:mb-16"
-          >
-            <h2 className="text-headline text-foreground mb-4">
-              Por que escolher a NexxusTECH?
-            </h2>
-          </motion.div>
-
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          >
-            {[
-              {
-                icon: <Zap className="w-6 h-6" />,
-                title: "Entrega Instantânea",
-                description: "Acesso imediato às licenças e cursos após a confirmação do pagamento.",
-              },
-              {
-                icon: <Globe className="w-6 h-6" />,
-                title: "Suporte Especializado",
-                description: "Equipe técnica dedicada para ajudar na implementação e uso das soluções.",
-              },
-              {
-                icon: <Award className="w-6 h-6" />,
-                title: "Parceiros Oficiais",
-                description: "Revendedores autorizados dos principais fabricantes de software do mercado.",
-              },
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                variants={fadeInScale}
-                transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-                className="text-center"
-              >
-                <div className="w-14 h-14 rounded-2xl bg-[#0071E3]/10 flex items-center justify-center text-[#0071E3] mx-auto mb-5">
-                  {item.icon}
+        <section className="border-y border-white/5 bg-white/[0.015] py-8">
+          <div className="container grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {officeApps.map(({ icon: Icon, name, detail }) => (
+              <div key={name} className="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.025] p-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0071E3]/10 text-[#58a9ff]">
+                  <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
-              </motion.div>
+                <div>
+                  <p className="text-sm font-semibold text-white">{name}</p>
+                  <p className="text-xs text-muted-foreground">{detail}</p>
+                </div>
+              </div>
             ))}
-          </motion.div>
-        </div>
-      </section>
+          </div>
+        </section>
 
-      {/* Stats Section with animated counters */}
-      <section className="py-12 md:py-20 bg-background border-y border-border">
-        <div className="container">
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8"
-          >
-            {[
-              { end: 500, suffix: "+", label: "Clientes Ativos" },
-              { end: 16, suffix: "", label: "Soluções Disponíveis" },
-              { end: 99, suffix: "%", label: "Satisfação" },
-              { end: 24, suffix: "/7", label: "Suporte" },
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                variants={fadeInScale}
-                transition={{ duration: 0.5 }}
-                className="text-center"
-              >
-                <p className="text-3xl md:text-4xl font-bold text-foreground mb-1">
-                  <AnimatedCounter end={stat.end} duration={2000} suffix={stat.suffix} />
-                </p>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <Testimonials />
-
-      {/* CTA Section */}
-      <section className="py-24 bg-background relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#0071E3]/5 rounded-full blur-[100px]" />
-        </div>
-        <div className="container relative z-10 text-center">
-          <motion.div
-            variants={fadeInUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
-          >
-            <h2 className="text-headline text-foreground mb-4">
-              Pronto para transformar seu negócio?
-            </h2>
-            <p className="text-body-large text-muted-foreground max-w-xl mx-auto mb-10">
-              Converse com nossa equipe e descubra as melhores soluções para sua empresa.
-            </p>
+        <section id="recursos" className="py-20 md:py-28">
+          <div className="container">
             <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.6 }}
+              className="mx-auto max-w-3xl text-center"
             >
-              <Link href="/b2b">
-                <span className="apple-btn apple-btn-primary text-base px-8 py-3.5">
-                  Solicitar Orçamento
-                </span>
-              </Link>
-              <Link href="/softwares">
-                <span className="apple-btn apple-btn-secondary text-base text-[#0071E3]">
-                  Ver Soluções <ArrowRight className="w-4 h-4 inline ml-1" />
-                </span>
-              </Link>
+              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-[#58a9ff]">Uma suíte. Vários fluxos.</p>
+              <h2 className="text-3xl font-semibold tracking-[-0.03em] text-white md:text-5xl">
+                Do slide em branco ao arquivo pronto para o cliente.
+              </h2>
+              <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
+                O Ampler reúne produtividade individual, conteúdo corporativo e controle de qualidade em uma experiência integrada ao Microsoft Office.
+              </p>
             </motion.div>
-          </motion.div>
-        </div>
-      </section>
+
+            <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {capabilities.map(({ icon: Icon, title, description }, index) => (
+                <motion.article
+                  key={title}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.45, delay: index * 0.04 }}
+                  className="group rounded-3xl border border-white/7 bg-gradient-to-b from-white/[0.045] to-white/[0.018] p-6 transition-colors hover:border-[#58a9ff]/30"
+                >
+                  <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0071E3]/10 text-[#58a9ff]">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white">{title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{description}</p>
+                </motion.article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-secondary py-20 md:py-28">
+          <div className="container grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+            <div>
+              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-[#54d6c7]">Conteúdo onde o trabalho acontece</p>
+              <h2 className="text-3xl font-semibold tracking-[-0.03em] text-white md:text-5xl">
+                Pare de procurar slides. Comece a construir argumentos.
+              </h2>
+              <p className="mt-6 text-base leading-relaxed text-muted-foreground">
+                A biblioteca do Ampler leva conteúdo aprovado para dentro do Office e pode conectar fontes como SharePoint, OneDrive e Google Drive. Templates, slides e elementos passam a ser reutilizáveis por toda a equipe.
+              </p>
+              <div className="mt-8 space-y-4">
+                {["Templates e slides aprovados", "Acesso direto no Microsoft Office", "Mais consistência entre equipes"].map((item) => (
+                  <div key={item} className="flex items-center gap-3 text-sm text-foreground/75">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#54d6c7]/10"><Check className="h-3.5 w-3.5 text-[#54d6c7]" /></span>
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-3xl border border-white/8 bg-background/70 p-6 sm:row-span-2">
+                <Users className="h-7 w-7 text-[#58a9ff]" />
+                <p className="mt-8 text-4xl font-semibold tracking-tight text-white">Um padrão</p>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">para apresentações, documentos e conteúdos compartilhados por toda a organização.</p>
+              </div>
+              <div className="rounded-3xl border border-white/8 bg-background/70 p-6">
+                <BriefcaseBusiness className="h-6 w-6 text-[#ec70b9]" />
+                <p className="mt-6 text-lg font-semibold text-white">Foco no insight</p>
+                <p className="mt-2 text-sm text-muted-foreground">Menos tempo em tarefas repetitivas.</p>
+              </div>
+              <div className="rounded-3xl border border-white/8 bg-background/70 p-6">
+                <ScanSearch className="h-6 w-6 text-[#54d6c7]" />
+                <p className="mt-6 text-lg font-semibold text-white">Qualidade consistente</p>
+                <p className="mt-2 text-sm text-muted-foreground">Verificações antes de entregar.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-20 md:py-28">
+          <div className="container">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-[#58a9ff]">Para equipes que vivem de clareza</p>
+              <h2 className="text-3xl font-semibold tracking-[-0.03em] text-white md:text-5xl">
+                Produtividade para quem precisa comunicar decisões.
+              </h2>
+            </div>
+            <div className="mx-auto mt-10 flex max-w-4xl flex-wrap justify-center gap-3">
+              {audiences.map((audience) => (
+                <span key={audience} className="rounded-full border border-white/8 bg-white/[0.025] px-5 py-3 text-sm text-foreground/70">
+                  {audience}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="pb-20 md:pb-28">
+          <div className="container">
+            <div className="relative overflow-hidden rounded-[2rem] border border-[#58a9ff]/20 bg-gradient-to-br from-[#0b2034] via-[#101923] to-[#251428] px-6 py-14 text-center md:px-12 md:py-20">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(88,169,255,0.18),transparent_45%)]" />
+              <div className="relative z-10 mx-auto max-w-3xl">
+                <h2 className="text-3xl font-semibold tracking-[-0.03em] text-white md:text-5xl">
+                  Veja o Ampler aplicado ao seu fluxo de trabalho.
+                </h2>
+                <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/60">
+                  Conte quantas pessoas usam PowerPoint, Excel, Word ou Outlook e receba uma recomendação de módulos, implantação e licenciamento.
+                </p>
+                <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+                  <Link href="/b2b?produto=ampler" className="apple-btn apple-btn-primary justify-center px-7 py-3.5 text-base">
+                    Solicitar demonstração
+                  </Link>
+                  <Link href="/comparar" className="apple-btn apple-btn-secondary justify-center px-7 py-3.5 text-base">
+                    Comparar abordagens
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
 
       <Footer />
     </div>

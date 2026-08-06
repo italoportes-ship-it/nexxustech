@@ -31,3 +31,21 @@
 - [x] Garantir idempotência no endpoint do CRM usando o protocolo do site
 - [x] Publicar a idempotência no CRM e validar reprocessamento sem duplicação
 - [x] Aplicar a estratégia nativa invisível selecionada, sem CAPTCHA externo
+
+- [x] Auditar integralmente o Product Decision Sheet e o prompt mestre anexados
+- [x] Inventariar produtos ativos, categorias e todas as páginas que consomem o catálogo
+- [x] Validar informações oficiais disponíveis sobre o Ampler e separar fatos de campos pendentes
+- [x] Produzir relatório de qualidade com completude, SEO, confiança e alertas
+- [x] Preservar o histórico e desativar todos os produtos atuais que não sejam Ampler
+- [x] Criar ou atualizar um único cadastro do Ampler sem duplicidade
+- [x] Definir posicionamento, resumo, descrição, benefícios, funcionalidades, FAQ e CTAs do Ampler
+- [x] Atualizar metadados, dados estruturados, canonical, Open Graph e termos de busca do Ampler
+- [x] Preparar e publicar ativo visual original adequado à página do Ampler
+- [x] Atualizar home, catálogo, categorias, busca, comparação, recomendação e navegação para somente Ampler
+- [x] Atualizar a página de produto e a jornada de orçamento/compra do Ampler
+- [x] Atualizar painel administrativo e APIs preservando compatibilidade
+- [x] Criar ou atualizar testes automatizados do catálogo exclusivo do Ampler
+- [x] Executar Vitest, verificação TypeScript e build de produção
+- [x] Validar responsividade, SEO e fluxos no preview
+- [ ] Salvar checkpoint publicável do site exclusivo do Ampler
+- [ ] Publicar e validar o novo site no domínio disponível

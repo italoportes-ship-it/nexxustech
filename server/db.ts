@@ -87,7 +87,18 @@ export async function getUserByOpenId(openId: string) {
 export async function getAllCategories() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(categories);
+  return db
+    .selectDistinct({
+      id: categories.id,
+      name: categories.name,
+      slug: categories.slug,
+      description: categories.description,
+      icon: categories.icon,
+      createdAt: categories.createdAt,
+    })
+    .from(categories)
+    .innerJoin(products, and(eq(products.categoryId, categories.id), eq(products.isActive, true)))
+    .orderBy(categories.id);
 }
 
 export async function getCategoryBySlug(slug: string) {
@@ -113,15 +124,21 @@ export async function getProductsByCategory(categoryId: number) {
 export async function getProductBySlug(slug: string) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
+  const result = await db.select().from(products).where(and(eq(products.slug, slug), eq(products.isActive, true))).limit(1);
   return result[0];
 }
 
 export async function getProductById(id: number) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
+  const result = await db.select().from(products).where(and(eq(products.id, id), eq(products.isActive, true))).limit(1);
   return result[0];
+}
+
+export async function getAllProductsIncludingInactive() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(products).orderBy(desc(products.isActive), products.name);
 }
 
 export async function getProductsByType(type: "software" | "course") {

@@ -248,16 +248,21 @@ export const appRouter = router({
         content: z.string(),
       })).optional(),
     })).mutation(async ({ input }) => {
-      const systemPrompt = `Você é o assistente virtual da NexxusTECH, uma plataforma premium de revenda de softwares e cursos digitais. 
+      const systemPrompt = `Você é o assistente virtual da NexxusTECH para o Ampler, a única solução publicada no catálogo.
+
+Fatos que você pode usar:
+- Ampler é uma plataforma de produtividade para PowerPoint, Excel, Word e Outlook.
+- Para PowerPoint, oferece 150+ ferramentas, biblioteca corporativa, Agenda, Storyboard, Ampler Charts, barra personalizável e Scan & Fix.
+- A biblioteca pode integrar conteúdo de SharePoint, OneDrive e Google Drive.
+- O instalador oficial é oferecido para Office 2007–2021 e Microsoft 365.
+- A contratação no Brasil é consultiva e depende de módulos, usuários e implantação.
 
 Suas responsabilidades:
-- Ajudar clientes a encontrar o software ou curso ideal para suas necessidades
-- Responder dúvidas sobre produtos, preços e funcionalidades
-- Guiar o processo de compra
-- Explicar as categorias disponíveis: Infraestrutura e Segurança Digital, Desenvolvimento e DevOps, Design e Produtividade, Análise de Dados e Estatística
-- Informar sobre opções B2B para empresas (licenciamento em volume, suporte dedicado)
+- Explicar os recursos do Ampler e identificar o contexto do cliente.
+- Incentivar a solicitação de demonstração e orçamento pelo formulário corporativo.
+- Ser claro quando um dado estiver pendente de validação.
 
-Seja profissional, amigável e direto. Responda sempre em português brasileiro. Mantenha respostas concisas mas informativas.`;
+Nunca invente preço em reais, economia percentual, SKU, SLA, case, avaliação ou superioridade sobre Think-cell. Responda sempre em português brasileiro, com tom profissional, amigável e conciso.`;
 
       const messages = [
         { role: "system" as const, content: systemPrompt },
@@ -330,7 +335,7 @@ Seja profissional, amigável e direto. Responda sempre em português brasileiro.
   admin: router({
     products: router({
       list: adminProcedure.query(async () => {
-        return db.getAllProducts();
+        return db.getAllProductsIncludingInactive();
       }),
       create: adminProcedure.input(z.object({
         name: z.string().min(1),
@@ -344,6 +349,16 @@ Seja profissional, amigável e direto. Responda sempre em português brasileiro.
         level: z.enum(["beginner", "intermediate", "advanced"]).optional(),
         duration: z.string().optional(),
         imageUrl: z.string().optional(),
+        manufacturer: z.string().optional(),
+        officialUrl: z.string().url().optional(),
+        licensing: z.string().optional(),
+        requirements: z.string().optional(),
+        seoTitle: z.string().optional(),
+        seoDescription: z.string().optional(),
+        seoKeywords: z.string().optional(),
+        faqs: z.string().optional(),
+        qualityScore: z.number().int().min(0).max(100).optional(),
+        sourceDocument: z.string().optional(),
       })).mutation(async ({ input }) => {
         await db.createProduct(input as any);
         return { success: true };
@@ -359,6 +374,17 @@ Seja profissional, amigável e direto. Responda sempre em português brasileiro.
         features: z.string().optional(),
         level: z.enum(["beginner", "intermediate", "advanced"]).optional(),
         imageUrl: z.string().optional(),
+        manufacturer: z.string().optional(),
+        officialUrl: z.string().url().optional(),
+        licensing: z.string().optional(),
+        requirements: z.string().optional(),
+        seoTitle: z.string().optional(),
+        seoDescription: z.string().optional(),
+        seoKeywords: z.string().optional(),
+        faqs: z.string().optional(),
+        qualityScore: z.number().int().min(0).max(100).optional(),
+        sourceDocument: z.string().optional(),
+        isActive: z.boolean().optional(),
       })).mutation(async ({ input }) => {
         const { id, ...data } = input;
         await db.updateProduct(id, data as any);

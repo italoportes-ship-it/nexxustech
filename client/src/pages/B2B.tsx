@@ -33,18 +33,23 @@ const cardReveal = {
   },
 };
 
+function hasAmplerInterest() {
+  return typeof window !== "undefined" && new URLSearchParams(window.location.search).get("produto") === "ampler";
+}
+
 export default function B2B() {
   const submitLead = trpc.b2b.submit.useMutation();
+  const isAmplerInterest = hasAmplerInterest();
   const formStartedAt = useRef(Date.now());
   const [website, setWebsite] = useState("");
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => ({
     companyName: "",
     contactName: "",
     email: "",
     phone: "",
     employees: "",
-    message: "",
-  });
+    message: isAmplerInterest ? "Tenho interesse em uma demonstração e orçamento do Ampler para minha equipe." : "",
+  }));
   const [submitted, setSubmitted] = useState(false);
   const [protocol, setProtocol] = useState("");
   const [submittedName, setSubmittedName] = useState("");
@@ -93,7 +98,7 @@ export default function B2B() {
                 Solicitação Enviada!
               </h1>
               <p className="text-body-large text-muted-foreground mb-10">
-                Obrigado, {submittedName}. Nossa equipe comercial entrará em contato em até 24 horas úteis.
+                Obrigado, {submittedName}. Nossa equipe comercial analisará o contexto e retornará com os próximos passos.
               </p>
 
               {/* Protocol card */}
@@ -124,8 +129,8 @@ export default function B2B() {
                 <div className="space-y-3">
                   {[
                     "Nossa equipe analisará sua solicitação e preparará um orçamento personalizado.",
-                    "Você receberá um contato por e-mail ou telefone em até 24h úteis.",
-                    "Após aprovação, liberamos as licenças com suporte dedicado.",
+                    "Você receberá um contato para alinhar aplicativos, usuários e necessidades de implantação.",
+                    "Após a definição do escopo, apresentamos a proposta de licenciamento e suporte.",
                   ].map((step, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <div className="w-6 h-6 rounded-full bg-[#0071E3]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -159,10 +164,10 @@ export default function B2B() {
   }
 
   const benefits = [
-    { icon: <Building2 className="w-6 h-6" />, title: "Licenciamento em Volume", desc: "Preços especiais para grandes quantidades de licenças." },
-    { icon: <Users className="w-6 h-6" />, title: "Gestão Centralizada", desc: "Painel único para gerenciar todas as licenças da empresa." },
-    { icon: <HeadphonesIcon className="w-6 h-6" />, title: "Suporte Dedicado", desc: "Equipe técnica exclusiva para sua empresa." },
-    { icon: <FileText className="w-6 h-6" />, title: "Nota Fiscal", desc: "Emissão de NF para todas as compras corporativas." },
+    { icon: <Building2 className="w-6 h-6" />, title: "Licenciamento por Usuário", desc: "Dimensionado conforme aplicativos e quantidade de usuários." },
+    { icon: <Users className="w-6 h-6" />, title: "Gestão de Assentos", desc: "Administração centralizada das licenças contratadas." },
+    { icon: <HeadphonesIcon className="w-6 h-6" />, title: "Implantação Consultiva", desc: "Diagnóstico de módulos, conteúdo e governança da organização." },
+    { icon: <FileText className="w-6 h-6" />, title: "Orçamento no Brasil", desc: "Proposta comercial conforme o escopo validado com a equipe." },
   ];
 
   return (
@@ -187,7 +192,7 @@ export default function B2B() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-[#0071E3] text-sm font-medium tracking-wide uppercase mb-4"
             >
-              Soluções Corporativas
+              {isAmplerInterest ? "Ampler para empresas" : "Soluções Corporativas"}
             </motion.p>
             <motion.h1
               initial={{ opacity: 0, y: 25, filter: "blur(8px)" }}
@@ -195,8 +200,11 @@ export default function B2B() {
               transition={{ duration: 0.7, delay: 0.3 }}
               className="text-headline text-foreground mb-6"
             >
-              Tecnologia sob medida
-              <br />para sua empresa.
+              {isAmplerInterest ? (
+                <>Veja o Ampler aplicado<br />ao seu fluxo de trabalho.</>
+              ) : (
+                <>Tecnologia sob medida<br />para sua empresa.</>
+              )}
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -204,7 +212,9 @@ export default function B2B() {
               transition={{ duration: 0.6, delay: 0.5 }}
               className="text-body-large text-muted-foreground max-w-2xl"
             >
-              Pacotes corporativos com licenciamento em volume, suporte dedicado e condições especiais para equipes de todos os tamanhos.
+              {isAmplerInterest
+                ? "Conte quantas pessoas usam PowerPoint, Excel, Word ou Outlook e receba uma recomendação de módulos, implantação e licenciamento."
+                : "Pacotes corporativos com licenciamento em volume, suporte dedicado e condições especiais para equipes de todos os tamanhos."}
             </motion.p>
           </motion.div>
         </div>
@@ -249,9 +259,11 @@ export default function B2B() {
               transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] }}
               className="text-center mb-12"
             >
-              <h2 className="text-title text-foreground mb-4">Solicitar Orçamento</h2>
+              <h2 className="text-title text-foreground mb-4">{isAmplerInterest ? "Solicitar demonstração do Ampler" : "Solicitar Orçamento"}</h2>
               <p className="text-sm text-muted-foreground">
-                Preencha o formulário e nossa equipe comercial entrará em contato em até 24h.
+                {isAmplerInterest
+                  ? "Preencha os dados e nossa equipe preparará uma conversa direcionada ao seu ambiente Microsoft Office."
+                  : "Preencha o formulário e nossa equipe comercial entrará em contato em até 24h."}
               </p>
             </motion.div>
 

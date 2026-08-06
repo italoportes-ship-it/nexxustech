@@ -15,7 +15,7 @@ function createPublicContext(): TrpcContext {
   };
 }
 
-function createAuthContext(): TrpcContext {
+function createAuthContext(role: "user" | "admin" = "user"): TrpcContext {
   return {
     user: {
       id: 1,
@@ -23,7 +23,7 @@ function createAuthContext(): TrpcContext {
       email: "test@example.com",
       name: "Test User",
       loginMethod: "manus",
-      role: "user",
+      role,
       createdAt: new Date(),
       updatedAt: new Date(),
       lastSignedIn: new Date(),
@@ -39,42 +39,52 @@ function createAuthContext(): TrpcContext {
 }
 
 describe("categories.list", () => {
-  it("returns an array of categories", async () => {
-    const ctx = createPublicContext();
-    const caller = appRouter.createCaller(ctx);
+  it("expõe somente a categoria que possui o Ampler ativo", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
     const result = await caller.categories.list();
-    expect(Array.isArray(result)).toBe(true);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({ slug: "design-produtividade", name: "Produtividade para Microsoft Office" });
   });
 });
 
 describe("products.list", () => {
-  it("returns an array of products", async () => {
-    const ctx = createPublicContext();
-    const caller = appRouter.createCaller(ctx);
+  it("expõe somente o Ampler no catálogo público", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
     const result = await caller.products.list();
-    expect(Array.isArray(result)).toBe(true);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({ name: "Ampler", slug: "ampler", type: "software", isActive: true });
+    expect(result[0].manufacturer).toBe("Ampler");
+    expect(result[0].qualityScore).toBe(93);
+  });
+
+  it("não expõe URLs de produtos históricos", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
+    const historical = await caller.products.bySlug({ slug: "cloudguard-enterprise" });
+    expect(historical).toBeUndefined();
   });
 });
 
 describe("products.byType", () => {
-  it("returns software products when type is software", async () => {
-    const ctx = createPublicContext();
-    const caller = appRouter.createCaller(ctx);
+  it("retorna somente o Ampler para software", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
     const result = await caller.products.byType({ type: "software" });
-    expect(Array.isArray(result)).toBe(true);
-    for (const product of result) {
-      expect(product.type).toBe("software");
-    }
+    expect(result).toHaveLength(1);
+    expect(result[0]?.slug).toBe("ampler");
   });
 
-  it("returns course products when type is course", async () => {
-    const ctx = createPublicContext();
-    const caller = appRouter.createCaller(ctx);
+  it("não expõe cursos desativados", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
     const result = await caller.products.byType({ type: "course" });
-    expect(Array.isArray(result)).toBe(true);
-    for (const product of result) {
-      expect(product.type).toBe("course");
-    }
+    expect(result).toEqual([]);
+  });
+});
+
+describe("admin.products.list", () => {
+  it("preserva o histórico de produtos inativos no painel administrativo", async () => {
+    const caller = appRouter.createCaller(createAuthContext("admin"));
+    const result = await caller.admin.products.list();
+    expect(result.some((product) => product.slug === "ampler" && product.isActive)).toBe(true);
+    expect(result.some((product) => product.slug !== "ampler" && !product.isActive)).toBe(true);
   });
 });
 

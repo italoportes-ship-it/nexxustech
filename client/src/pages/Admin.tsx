@@ -103,22 +103,40 @@ export default function Admin() {
             {activeTab === "products" && (
               <div className="space-y-3">
                 {products.map((product) => (
-                  <div key={product.id} className="bento-card !p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
-                        <Package className="w-5 h-5 text-muted-foreground" />
+                  <div key={product.id} className={`bento-card !p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ${!product.isActive ? "opacity-55" : ""}`}>
+                    <div className="flex min-w-0 items-center gap-4">
+                      <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${product.isActive ? "bg-[#0071E3]/10 text-[#58a9ff]" : "bg-accent text-muted-foreground"}`}>
+                        <Package className="h-5 w-5" />
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{product.name}</p>
-                        <p className="text-xs text-muted-foreground">{product.type} | R$ {parseFloat(product.price).toFixed(2)}</p>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="truncate text-sm font-medium text-foreground">{product.name}</p>
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${product.isActive ? "bg-green-500/10 text-green-400" : "bg-white/5 text-muted-foreground"}`}>
+                            {product.isActive ? "ATIVO" : "HISTÓRICO"}
+                          </span>
+                          {product.qualityScore != null && (
+                            <span className="rounded-full bg-[#54d6c7]/10 px-2 py-0.5 text-[10px] text-[#54d6c7]">Qualidade {product.qualityScore}/100</span>
+                          )}
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {product.manufacturer || "Fabricante não informado"} · {parseFloat(product.price) > 0 ? `R$ ${parseFloat(product.price).toFixed(2)}` : "Preço sob consulta"}
+                        </p>
+                        <p className="mt-1 truncate text-[11px] text-muted-foreground/60">/{product.slug}</p>
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="p-2 text-muted-foreground hover:text-red-400 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {product.isActive && product.slug !== "ampler" ? (
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="self-end p-2 text-muted-foreground transition-colors hover:text-red-400 sm:self-auto"
+                        aria-label={`Desativar ${product.name}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    ) : (
+                      <span className="self-end text-[11px] text-muted-foreground/50 sm:self-auto">
+                        {product.slug === "ampler" ? "Produto principal" : "Registro preservado"}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>

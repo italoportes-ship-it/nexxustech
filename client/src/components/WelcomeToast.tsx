@@ -13,7 +13,7 @@ export default function WelcomeToast() {
       // Small delay to ensure page has rendered
       setTimeout(() => {
         toast.success(`Bem-vindo de volta, ${firstName}!`, {
-          description: "Explore nossas soluções e cursos digitais.",
+          description: "Conheça o Ampler e solicite uma demonstração para sua equipe.",
           duration: 4000,
         });
       }, 500);
