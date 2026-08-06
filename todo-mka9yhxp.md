@@ -47,5 +47,5 @@
 - [x] Criar ou atualizar testes automatizados do catálogo exclusivo do Ampler
 - [x] Executar Vitest, verificação TypeScript e build de produção
 - [x] Validar responsividade, SEO e fluxos no preview
-- [ ] Salvar checkpoint publicável do site exclusivo do Ampler
-- [ ] Publicar e validar o novo site no domínio disponível
+- [x] Salvar checkpoint publicável do site exclusivo do Ampler
+- [x] Publicar e validar o novo site no domínio disponível

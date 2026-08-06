@@ -31,3 +31,15 @@ Após a conclusão da consulta, `/softwares` exibiu exatamente um card: Ampler, 
 A rota `/b2b?produto=ampler` exibiu o título “Veja o Ampler aplicado ao seu fluxo de trabalho”, o CTA de demonstração e a mensagem pré-carregada `Tenho interesse em uma demonstração e orçamento do Ampler para minha equipe.`, mantendo o honeypot ativo. A rota histórica `/cursos` redirecionou automaticamente para `/produto/ampler`, preservando acesso sem revelar cursos desativados.
 
 A revisão final de `/b2b?produto=ampler` confirmou os cards “Licenciamento por Usuário”, “Gestão de Assentos”, “Implantação Consultiva” e “Orçamento no Brasil”. O texto não promete desconto, SLA ou prazo de retorno; a mensagem de interesse continua pré-carregada e o honeypot permanece fora da área visual.
+
+## Validação do domínio publicado
+
+O domínio `https://nexxusapp-dayfmj3q.manus.space` respondeu e renderizou a nova home. O title publicado é `Ampler para Microsoft Office | Produtividade e Consistência | NexxusTECH`. A página exibe a logomarca oficial, o hero final, PowerPoint, Excel, Word e Outlook, seis recursos comprovados, CTAs de demonstração e nenhum produto do catálogo anterior.
+
+A rota pública `https://nexxusapp-dayfmj3q.manus.space/produto/ampler` carregou integralmente após a consulta do produto. Logomarca, hero, sete recursos, requisitos, contratação consultiva, seis FAQs e CTAs de demonstração aparecem corretamente; nenhum produto desativado ou preço fictício foi exibido.
+
+No domínio publicado, o DOM de `/produto/ampler` confirmou canonical `https://nexxusapp-dayfmj3q.manus.space/produto/ampler`, description, Open Graph title/description/image, Twitter Card e os schemas `SoftwareApplication` e `FAQPage`. A rota pública `/b2b?produto=ampler` iniciou o carregamento normalmente e será validada após a hidratação.
+
+A rota pública `/b2b?produto=ampler` hidratou corretamente e exibiu os quatro benefícios comerciais revisados, a mensagem pré-carregada, os campos obrigatórios, o honeypot e o botão de envio. Não há promessa de desconto, SLA ou prazo não homologado.
+
+A URL histórica `/produto/cloudguard-enterprise` não expõe o produto desativado. Após a consulta, a página informou “Produto não disponível”, explicou que o catálogo é exclusivo do Ampler e ofereceu somente o CTA `Conhecer o Ampler`.
