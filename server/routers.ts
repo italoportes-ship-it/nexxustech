@@ -7,7 +7,6 @@ import { z } from "zod";
 import * as db from "./db";
 import { invokeLLM } from "./_core/llm";
 import { notifyOwner } from "./_core/notification";
-import { createCheckoutSession } from "./stripe";
 import { sendNewsletterToCRM } from "./crm";
 import {
   LEAD_ANTI_SPAM,
@@ -22,6 +21,8 @@ import { syncB2BLeadWithCRM } from "./leadSync";
 import { adminPricingRouter, productResourcesRouter } from "./routers/commercial";
 import { adminPdsRouter } from "./routers/pds";
 import { adminAdministrationRouter } from "./routers/administration";
+import { checkoutRouter } from "./routers/checkout";
+import { adminCommerceRouter } from "./routers/commerceAdmin";
 
 export const appRouter = router({
   system: systemRouter,
@@ -64,6 +65,7 @@ export const appRouter = router({
   }),
 
   productResources: productResourcesRouter,
+  checkout: checkoutRouter,
 
   // ===== CART =====
   cart: router({
@@ -90,56 +92,14 @@ export const appRouter = router({
 
   // ===== ORDERS =====
   orders: router({
-    myOrders: protectedProcedure.query(async ({ ctx }) => {
-      return db.getUserOrders(ctx.user.id);
+    myOrders: protectedProcedure.query(() => {
+      throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Use o módulo seguro de pedidos em checkout.myOrders." });
     }),
-    getItems: protectedProcedure.input(z.object({ orderId: z.number() })).query(async ({ input }) => {
-      return db.getOrderItems(input.orderId);
+    getItems: protectedProcedure.input(z.object({ orderId: z.number() })).query(() => {
+      throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Use checkout.details para consultar itens com autorização." });
     }),
-    create: protectedProcedure.mutation(async ({ ctx }) => {
-      const cartItems = await db.getCartItems(ctx.user.id);
-      if (cartItems.length === 0) {
-        throw new Error("Cart is empty");
-      }
-      const total = cartItems.reduce((sum, item) => sum + parseFloat(item.product.price) * item.quantity, 0);
-      const orderId = await db.createOrder(ctx.user.id, total.toFixed(2), ctx.user.email ?? null);
-      if (!orderId) throw new Error("Failed to create order");
-      for (const item of cartItems) {
-        await db.addOrderItem(orderId, item.productId, item.product.name, item.product.price, item.quantity);
-      }
-      await db.clearCart(ctx.user.id);
-      
-      // Notify owner about new order
-      await notifyOwner({
-        title: `Novo Pedido #${orderId}`,
-        content: `Um novo pedido foi realizado por ${ctx.user.name || ctx.user.email || 'Cliente'}. Total: R$ ${total.toFixed(2)}. Itens: ${cartItems.map(i => i.product.name).join(', ')}.`
-      });
-
-      // CRM notification happens on payment confirmation (Stripe webhook)
-
-      // Create Stripe checkout session
-      const origin = ctx.req.headers.origin || `${ctx.req.protocol}://${ctx.req.headers.host}`;
-      const stripeItems = cartItems.map(item => ({
-        name: item.product.name,
-        price: parseFloat(item.product.price),
-        quantity: item.quantity,
-      }));
-      
-      let checkoutUrl: string | null = null;
-      try {
-        checkoutUrl = await createCheckoutSession(
-          ctx.user.id,
-          ctx.user.email ?? null,
-          ctx.user.name ?? null,
-          orderId,
-          stripeItems,
-          origin
-        );
-      } catch (err) {
-        console.error("[Stripe] Failed to create checkout session:", err);
-      }
-
-      return { orderId, total: total.toFixed(2), checkoutUrl };
+    create: protectedProcedure.mutation(() => {
+      throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Use o checkout seguro com dados fiscais do comprador." });
     }),
   }),
 
@@ -338,6 +298,7 @@ Nunca invente preço em reais, economia percentual, SKU, SLA, case, avaliação 
 
   // ===== ADMIN =====
   admin: router({
+    commerce: adminCommerceRouter,
     administration: adminAdministrationRouter,
     pricing: adminPricingRouter,
     pds: adminPdsRouter,
@@ -404,11 +365,11 @@ Nunca invente preço em reais, economia percentual, SKU, SLA, case, avaliação 
       }),
     }),
     orders: router({
-      list: adminProcedure.query(async () => {
-        return db.getAllOrders();
+      list: adminProcedure.query(() => {
+        throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Use admin.commerce.list." });
       }),
-      getItems: adminProcedure.input(z.object({ orderId: z.number() })).query(async ({ input }) => {
-        return db.getOrderItems(input.orderId);
+      getItems: adminProcedure.input(z.object({ orderId: z.number() })).query(() => {
+        throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Use admin.commerce.details." });
       }),
     }),
     leads: router({

@@ -13,11 +13,15 @@ export default function Cart() {
   const cartQuery = trpc.cart.list.useQuery(undefined, { enabled: isAuthenticated });
   const removeMutation = trpc.cart.remove.useMutation();
   const updateQtyMutation = trpc.cart.updateQuantity.useMutation();
-  const createOrderMutation = trpc.orders.create.useMutation();
   const utils = trpc.useUtils();
 
   const items = cartQuery.data || [];
-  const total = items.reduce((sum, item) => sum + parseFloat(item.product.price) * item.quantity, 0);
+  const firstItem = items[0];
+  const quoteQuery = trpc.checkout.quote.useQuery(
+    { productId: firstItem?.productId || 1, quantity: firstItem?.quantity || 1 },
+    { enabled: isAuthenticated && items.length === 1 },
+  );
+  const total = quoteQuery.data?.price.total || 0;
 
   const handleRemove = (productId: number) => {
     removeMutation.mutate({ productId }, {
@@ -35,21 +39,11 @@ export default function Cart() {
   };
 
   const handleCheckout = () => {
-    createOrderMutation.mutate(undefined, {
-      onSuccess: (data) => {
-        utils.cart.list.invalidate();
-        if (data.checkoutUrl) {
-          toast.success("Redirecionando para o pagamento...");
-          window.open(data.checkoutUrl, "_blank");
-        } else {
-          toast.success("Pedido criado! Redirecionando...");
-          setLocation(`/checkout/${data.orderId}`);
-        }
-      },
-      onError: () => {
-        toast.error("Erro ao criar pedido. Tente novamente.");
-      },
-    });
+    if (items.length !== 1 || !firstItem || !quoteQuery.data) {
+      toast.error(items.length > 1 ? "Finalize um software por pedido." : "Não existe preço homologado para este item.");
+      return;
+    }
+    setLocation(`/checkout/novo?productId=${firstItem.productId}&quantity=${firstItem.quantity}`);
   };
 
   return (
@@ -114,7 +108,7 @@ export default function Cart() {
                         </button>
                       </div>
                       <span className="text-sm font-semibold text-foreground w-28 text-right">
-                        R$ {(parseFloat(item.product.price) * item.quantity).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                        {items.length === 1 && quoteQuery.data ? `R$ ${quoteQuery.data.price.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "Sob consulta"}
                       </span>
                       <button
                         onClick={() => handleRemove(item.productId)}
@@ -150,10 +144,10 @@ export default function Cart() {
                     </div>
                     <button
                       onClick={handleCheckout}
-                      disabled={createOrderMutation.isPending}
+                      disabled={quoteQuery.isLoading || !quoteQuery.data || items.length !== 1}
                       className="apple-btn apple-btn-primary w-full text-base py-3.5 disabled:opacity-50"
                     >
-                      {createOrderMutation.isPending ? "Processando..." : (
+                      {quoteQuery.isLoading ? "Validando preço..." : (
                         <>Finalizar Compra <ArrowRight className="w-4 h-4 ml-2" /></>
                       )}
                     </button>

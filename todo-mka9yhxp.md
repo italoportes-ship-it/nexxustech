@@ -110,3 +110,33 @@
 - [x] Impedir que custo, impostos, margem e markup apareçam em APIs públicas
 - [x] Adicionar testes unitários e integrados da base Administração
 - [x] Validar o painel Administração em desktop e mobile
+- [x] Auditar código atual de carrinho, pedidos, Stripe, checkout e webhooks
+- [x] Definir checkout hospedado Stripe e métodos compatíveis com BRL/Brasil
+- [x] Definir fornecedor fiscal ou modo de preparação fiscal sem emissão fictícia
+- [x] Criar tabela de clientes/compradores com CPF/CNPJ e endereço protegido
+- [x] Ampliar pedidos com estados pending, paid, failed, cancelled, refunded e chargeback
+- [x] Criar tabela de pagamentos sem armazenar dados sensíveis de cartão
+- [x] Criar tabela de notas fiscais e links seguros de PDF/XML
+- [x] Criar tabela de licenças e entregas digitais vinculadas ao pedido pago
+- [x] Criar tabela idempotente de eventos de webhook
+- [x] Criar pedido pending a partir de preço final publicado e nunca confiar no preço do frontend
+- [x] Coletar e validar nome/razão social, e-mail, CPF/CNPJ, telefone e endereço fiscal
+- [x] Criar Stripe Checkout Session no backend com metadata do pedido e comprador
+- [x] Exibir dinamicamente cartão e métodos brasileiros quando habilitados na conta Stripe
+- [x] Garantir que checkout e webhooks não exponham chaves secretas
+- [x] Implementar endpoint `/api/stripe/webhook` com assinatura e body bruto
+- [x] Implementar idempotência de webhook e máquina de estados de pagamento
+- [x] Confirmar pagamento somente por webhook ou verificação confiável no backend
+- [x] Liberar licença e download somente após status paid
+- [x] Gerar entitlement digital único, não previsível e vinculado ao comprador
+- [x] Criar página de checkout segura
+- [x] Criar páginas de sucesso, processamento, cancelamento e erro
+- [x] Criar área do cliente com pedidos, pagamento, licença, downloads e nota fiscal
+- [x] Criar painel admin com filtros, transações, notas, reenvio e observações
+- [x] Preparar integração fiscal com adapter e status sem emitir documento antes da configuração
+- [x] Preparar confirmação de compra sem dados sensíveis e manter envio pendente sem credencial
+- [x] Implementar proteção antifraude básica e limitação de frequência
+- [x] Criar testes de pedido, pagamento, webhook, idempotência, licença e falhas
+- [x] Criar documentação de Stripe sandbox, webhook e configuração fiscal
+- [x] Executar migração, testes, TypeScript, build e validação responsiva
+- [ ] Salvar checkpoint, publicar e validar em produção sem cobrança real

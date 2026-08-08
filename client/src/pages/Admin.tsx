@@ -2,19 +2,21 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AdministrationManager from "@/components/admin/AdministrationManager";
 import PdsManager from "@/components/admin/PdsManager";
+import CommerceManager from "@/components/admin/CommerceManager";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { AlertTriangle, CheckCircle2, Clock3, FileUp, Package, RefreshCw, SlidersHorizontal, Users, ShoppingCart, MessageSquare, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock3, CreditCard, FileUp, Package, RefreshCw, SlidersHorizontal, Users, MessageSquare, Plus, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 
-type AdminTab = "products" | "administration" | "pds" | "orders" | "leads" | "users";
+type AdminTab = "products" | "administration" | "pds" | "commerce" | "leads" | "users";
 
 function getInitialAdminTab(): AdminTab {
   const tab = new URLSearchParams(window.location.search).get("tab");
   if (tab === "pricing") return "administration";
-  return tab === "administration" || tab === "pds" || tab === "orders" || tab === "leads" || tab === "users" ? tab : "products";
+  if (tab === "orders") return "commerce";
+  return tab === "administration" || tab === "pds" || tab === "commerce" || tab === "leads" || tab === "users" ? tab : "products";
 }
 
 export default function Admin() {
@@ -22,7 +24,6 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState<AdminTab>(getInitialAdminTab);
 
   const productsQuery = trpc.admin.products.list.useQuery(undefined, { enabled: isAuthenticated && user?.role === "admin" });
-  const ordersQuery = trpc.admin.orders.list.useQuery(undefined, { enabled: isAuthenticated && user?.role === "admin" && activeTab === "orders" });
   const leadsQuery = trpc.admin.leads.list.useQuery(undefined, { enabled: isAuthenticated && user?.role === "admin" && activeTab === "leads" });
   const usersQuery = trpc.admin.users.list.useQuery(undefined, { enabled: isAuthenticated && user?.role === "admin" && activeTab === "users" });
   const deleteMutation = trpc.admin.products.delete.useMutation();
@@ -39,7 +40,6 @@ export default function Admin() {
   }
 
   const products = productsQuery.data || [];
-  const orders = ordersQuery.data || [];
   const leads = leadsQuery.data || [];
   const users2 = usersQuery.data || [];
   const amplerProduct = products.find((product) => product.slug === "ampler");
@@ -68,7 +68,7 @@ export default function Admin() {
     { key: "products" as const, label: "Produtos", icon: <Package className="w-4 h-4" />, count: products.length },
     { key: "administration" as const, label: "Administração", icon: <SlidersHorizontal className="w-4 h-4" />, count: null },
     { key: "pds" as const, label: "Importar PDS", icon: <FileUp className="w-4 h-4" />, count: null },
-    { key: "orders" as const, label: "Pedidos", icon: <ShoppingCart className="w-4 h-4" />, count: orders.length },
+    { key: "commerce" as const, label: "Commerce", icon: <CreditCard className="w-4 h-4" />, count: null },
     { key: "leads" as const, label: "Leads B2B", icon: <MessageSquare className="w-4 h-4" />, count: leads.length },
     { key: "users" as const, label: "Usuários", icon: <Users className="w-4 h-4" />, count: users2.length },
   ];
@@ -156,28 +156,7 @@ export default function Admin() {
               amplerProduct ? <PdsManager productId={amplerProduct.id} /> : <p className="py-10 text-center text-muted-foreground">Carregando cadastro do Ampler...</p>
             )}
 
-            {/* Orders Tab */}
-            {activeTab === "orders" && (
-              <div className="space-y-3">
-                {orders.map((order) => (
-                  <div key={order.id} className="bento-card !p-4 flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Pedido #{order.id}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(order.createdAt).toLocaleDateString("pt-BR")} | {order.customerEmail || "N/A"}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-foreground">R$ {parseFloat(order.totalAmount).toFixed(2)}</p>
-                      <p className={`text-xs ${order.status === "paid" ? "text-green-400" : "text-yellow-400"}`}>
-                        {order.status}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                {orders.length === 0 && <p className="text-center text-muted-foreground py-10">Nenhum pedido encontrado.</p>}
-              </div>
-            )}
+            {activeTab === "commerce" && <CommerceManager />}
 
             {/* Leads Tab */}
             {activeTab === "leads" && (

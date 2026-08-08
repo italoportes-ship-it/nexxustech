@@ -236,7 +236,7 @@ export default function ProductDetail() {
                     <p className="text-sm font-semibold text-white">{price.planName}</p>
                     <p className="mt-5 text-3xl font-semibold text-white">R$ {Number(price.approvedPriceBrl).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
                     <p className="mt-2 text-xs text-muted-foreground">{price.billingPeriod === "monthly" ? "por mês" : price.billingPeriod === "annual" ? "por ano" : "condição personalizada"} · a partir de {price.minSeats} assento(s)</p>
-                    <Link href="/b2b?produto=ampler" className="mt-6 inline-flex text-sm font-semibold text-[#54d6c7]">Solicitar proposta <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                    <Link href={`/checkout/novo?productId=${product.id}&quantity=${price.minSeats}`} className="mt-6 inline-flex text-sm font-semibold text-[#54d6c7]">Comprar com segurança <ArrowRight className="ml-2 h-4 w-4" /></Link>
                   </div>
                 ))}
               </div>

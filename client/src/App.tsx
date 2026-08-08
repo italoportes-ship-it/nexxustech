@@ -18,6 +18,11 @@ const Category = lazy(() => import("./pages/Category"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const B2B = lazy(() => import("./pages/B2B"));
 const Cart = lazy(() => import("./pages/Cart"));
+const CheckoutStart = lazy(() => import("./pages/CheckoutStart"));
+const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));
+const CheckoutProcessing = lazy(() => import("./pages/CheckoutProcessing"));
+const CheckoutCancelled = lazy(() => import("./pages/CheckoutCancelled"));
+const CheckoutError = lazy(() => import("./pages/CheckoutError"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const Account = lazy(() => import("./pages/Account"));
 const Admin = lazy(() => import("./pages/Admin"));
@@ -52,6 +57,11 @@ function Router() {
             <Route path="/produto/:slug" component={ProductDetail} />
             <Route path="/b2b" component={B2B} />
             <Route path="/carrinho" component={Cart} />
+            <Route path="/checkout/novo" component={CheckoutStart} />
+            <Route path="/checkout/sucesso" component={CheckoutSuccess} />
+            <Route path="/checkout/processando" component={CheckoutProcessing} />
+            <Route path="/checkout/cancelado" component={CheckoutCancelled} />
+            <Route path="/checkout/erro" component={CheckoutError} />
             <Route path="/checkout/:orderId" component={Checkout} />
             <Route path="/conta" component={Account} />
             <Route path="/admin" component={Admin} />

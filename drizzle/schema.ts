@@ -19,6 +19,28 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
 /**
+ * Buyer and fiscal profile. Sensitive fields are encrypted by the server.
+ */
+export const customers = mysqlTable("customers", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  customerType: mysqlEnum("customerType", ["person", "company"]).default("person").notNull(),
+  fullName: varchar("fullName", { length: 255 }).notNull(),
+  legalName: varchar("legalName", { length: 255 }),
+  email: varchar("email", { length: 320 }).notNull(),
+  taxIdEncrypted: text("taxIdEncrypted").notNull(),
+  taxIdLast4: varchar("taxIdLast4", { length: 4 }).notNull(),
+  phoneEncrypted: text("phoneEncrypted"),
+  billingAddressEncrypted: text("billingAddressEncrypted"),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Customer = typeof customers.$inferSelect;
+export type InsertCustomer = typeof customers.$inferInsert;
+
+/**
  * Product categories
  */
 export const categories = mysqlTable("categories", {
@@ -253,11 +275,32 @@ export const pdsAuditLogs = mysqlTable("pdsAuditLogs", {
 export const orders = mysqlTable("orders", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(),
-  status: mysqlEnum("status", ["pending", "paid", "failed", "refunded"]).default("pending").notNull(),
+  customerId: int("customerId"),
+  orderNumber: varchar("orderNumber", { length: 40 }).unique(),
+  status: mysqlEnum("status", ["pending", "paid", "failed", "cancelled", "refunded", "chargeback"]).default("pending").notNull(),
+  currency: varchar("currency", { length: 3 }).default("BRL").notNull(),
+  subtotalAmount: decimal("subtotalAmount", { precision: 12, scale: 2 }),
+  discountAmount: decimal("discountAmount", { precision: 12, scale: 2 }).default("0").notNull(),
   totalAmount: decimal("totalAmount", { precision: 10, scale: 2 }).notNull(),
+  couponCode: varchar("couponCode", { length: 100 }),
+  paymentMethod: varchar("paymentMethod", { length: 50 }),
   stripeSessionId: varchar("stripeSessionId", { length: 255 }),
   stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
   customerEmail: varchar("customerEmail", { length: 320 }),
+  customerSnapshotEncrypted: text("customerSnapshotEncrypted"),
+  idempotencyKey: varchar("idempotencyKey", { length: 64 }).unique(),
+  sourceIpHash: varchar("sourceIpHash", { length: 64 }),
+  userAgentHash: varchar("userAgentHash", { length: 64 }),
+  internalNotes: text("internalNotes"),
+  checkoutCreatedAt: timestamp("checkoutCreatedAt"),
+  paidAt: timestamp("paidAt"),
+  failedAt: timestamp("failedAt"),
+  cancelledAt: timestamp("cancelledAt"),
+  refundedAt: timestamp("refundedAt"),
+  chargebackAt: timestamp("chargebackAt"),
+  expiresAt: timestamp("expiresAt"),
+  termsAcceptedAt: timestamp("termsAcceptedAt"),
+  privacyAcceptedAt: timestamp("privacyAcceptedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -272,12 +315,111 @@ export const orderItems = mysqlTable("orderItems", {
   id: int("id").autoincrement().primaryKey(),
   orderId: int("orderId").notNull(),
   productId: int("productId").notNull(),
+  productPriceId: int("productPriceId"),
   productName: varchar("productName", { length: 255 }).notNull(),
+  planName: varchar("planName", { length: 255 }),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  unitPrice: decimal("unitPrice", { precision: 12, scale: 2 }),
+  totalPrice: decimal("totalPrice", { precision: 12, scale: 2 }),
+  currency: varchar("currency", { length: 3 }).default("BRL").notNull(),
+  licenseTerm: varchar("licenseTerm", { length: 100 }),
   quantity: int("quantity").default(1).notNull(),
 });
 
 export type OrderItem = typeof orderItems.$inferSelect;
+
+export const payments = mysqlTable("payments", {
+  id: int("id").autoincrement().primaryKey(),
+  orderId: int("orderId").notNull(),
+  provider: mysqlEnum("provider", ["stripe"]).default("stripe").notNull(),
+  status: mysqlEnum("status", ["pending", "processing", "succeeded", "failed", "cancelled", "refunded", "chargeback"]).default("pending").notNull(),
+  externalSessionId: varchar("externalSessionId", { length: 255 }).unique(),
+  externalPaymentIntentId: varchar("externalPaymentIntentId", { length: 255 }),
+  externalChargeId: varchar("externalChargeId", { length: 255 }),
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("BRL").notNull(),
+  paymentMethod: varchar("paymentMethod", { length: 50 }),
+  failureCode: varchar("failureCode", { length: 100 }),
+  failureMessage: varchar("failureMessage", { length: 500 }),
+  confirmedAt: timestamp("confirmedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Payment = typeof payments.$inferSelect;
+
+export const invoices = mysqlTable("invoices", {
+  id: int("id").autoincrement().primaryKey(),
+  orderId: int("orderId").notNull().unique(),
+  provider: mysqlEnum("provider", ["nfeio", "focus", "enotas", "manual", "unconfigured"]).default("unconfigured").notNull(),
+  documentType: mysqlEnum("documentType", ["nfse", "nfe", "other", "pending"]).default("pending").notNull(),
+  status: mysqlEnum("status", ["pending_configuration", "pending", "processing", "issued", "failed", "cancelled"]).default("pending_configuration").notNull(),
+  externalId: varchar("externalId", { length: 255 }),
+  number: varchar("number", { length: 100 }),
+  pdfUrl: varchar("pdfUrl", { length: 1000 }),
+  xmlStorageKey: varchar("xmlStorageKey", { length: 1000 }),
+  errorMessage: varchar("errorMessage", { length: 1000 }),
+  issuedAt: timestamp("issuedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Invoice = typeof invoices.$inferSelect;
+
+export const licenses = mysqlTable("licenses", {
+  id: int("id").autoincrement().primaryKey(),
+  orderId: int("orderId").notNull(),
+  orderItemId: int("orderItemId").notNull(),
+  userId: int("userId").notNull(),
+  productId: int("productId").notNull(),
+  quantity: int("quantity").default(1).notNull(),
+  status: mysqlEnum("status", ["pending_payment", "awaiting_vendor", "active", "suspended", "revoked"]).default("pending_payment").notNull(),
+  entitlementTokenHash: varchar("entitlementTokenHash", { length: 64 }).notNull().unique(),
+  entitlementTokenLast4: varchar("entitlementTokenLast4", { length: 4 }).notNull(),
+  licenseKeyEncrypted: text("licenseKeyEncrypted"),
+  licenseKeyLast4: varchar("licenseKeyLast4", { length: 4 }),
+  downloadUrl: varchar("downloadUrl", { length: 1000 }),
+  installationInstructions: text("installationInstructions"),
+  activatedAt: timestamp("activatedAt"),
+  deliveredAt: timestamp("deliveredAt"),
+  expiresAt: timestamp("expiresAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type License = typeof licenses.$inferSelect;
+
+export const webhookEvents = mysqlTable("webhookEvents", {
+  id: int("id").autoincrement().primaryKey(),
+  provider: mysqlEnum("provider", ["stripe", "nfeio", "focus", "enotas"]).notNull(),
+  eventId: varchar("eventId", { length: 255 }).notNull().unique(),
+  eventType: varchar("eventType", { length: 255 }).notNull(),
+  payloadHash: varchar("payloadHash", { length: 64 }).notNull(),
+  status: mysqlEnum("status", ["received", "processing", "processed", "ignored", "failed"]).default("received").notNull(),
+  orderId: int("orderId"),
+  paymentId: int("paymentId"),
+  attempts: int("attempts").default(0).notNull(),
+  errorMessage: varchar("errorMessage", { length: 1000 }),
+  receivedAt: timestamp("receivedAt").defaultNow().notNull(),
+  processedAt: timestamp("processedAt"),
+});
+
+export type WebhookEvent = typeof webhookEvents.$inferSelect;
+
+export const commerceMessages = mysqlTable("commerceMessages", {
+  id: int("id").autoincrement().primaryKey(),
+  orderId: int("orderId").notNull(),
+  messageType: mysqlEnum("messageType", ["order_created", "payment_confirmed", "license_ready", "invoice_ready"]).notNull(),
+  recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
+  status: mysqlEnum("status", ["pending_configuration", "pending", "sent", "failed"]).default("pending_configuration").notNull(),
+  externalId: varchar("externalId", { length: 255 }),
+  errorMessage: varchar("errorMessage", { length: 1000 }),
+  sentAt: timestamp("sentAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CommerceMessage = typeof commerceMessages.$inferSelect;
 
 /**
  * Cart items (per user)

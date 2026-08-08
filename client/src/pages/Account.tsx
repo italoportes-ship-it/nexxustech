@@ -1,155 +1,64 @@
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { trpc } from "@/lib/trpc";
+import Navbar from "@/components/Navbar";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
+import { CheckCircle2, Clock3, Download, FileText, KeyRound, LogOut, Package, RefreshCw, ShoppingCart, User, XCircle } from "lucide-react";
+import { useState } from "react";
 import { Link } from "wouter";
-import { Package, ShoppingCart, User, LogOut, Clock, CheckCircle, XCircle } from "lucide-react";
-import { motion } from "framer-motion";
-import AnimatedCounter from "@/components/AnimatedCounter";
 
-const statusLabels: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  pending: { label: "Pendente", color: "text-yellow-400", icon: <Clock className="w-4 h-4" /> },
-  paid: { label: "Pago", color: "text-green-400", icon: <CheckCircle className="w-4 h-4" /> },
-  failed: { label: "Falhou", color: "text-red-400", icon: <XCircle className="w-4 h-4" /> },
-  refunded: { label: "Reembolsado", color: "text-blue-400", icon: <Package className="w-4 h-4" /> },
+const orderStatus: Record<string, { label: string; color: string; icon: typeof Clock3 }> = {
+  pending: { label: "Pendente", color: "text-amber-300", icon: Clock3 },
+  paid: { label: "Pago", color: "text-green-300", icon: CheckCircle2 },
+  failed: { label: "Falhou", color: "text-red-300", icon: XCircle },
+  cancelled: { label: "Cancelado", color: "text-muted-foreground", icon: XCircle },
+  refunded: { label: "Estornado", color: "text-blue-300", icon: RefreshCw },
+  chargeback: { label: "Contestado", color: "text-red-300", icon: XCircle },
 };
+
+function OrderCard({ entry }: { entry: any }) {
+  const [expanded, setExpanded] = useState(false);
+  const detailsQuery = trpc.checkout.details.useQuery({ orderId: entry.order.id }, { enabled: expanded });
+  const status = orderStatus[entry.order.status] || orderStatus.pending;
+  const StatusIcon = status.icon;
+
+  return (
+    <article className="bento-card !p-5">
+      <button onClick={() => setExpanded((value) => !value)} className="flex w-full flex-col gap-4 text-left sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4"><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent"><Package className="h-5 w-5 text-[#58a9ff]" /></div><div><p className="text-sm font-medium text-white">{entry.order.orderNumber || `Pedido #${entry.order.id}`}</p><p className="mt-1 text-xs text-muted-foreground">{new Date(entry.order.createdAt).toLocaleString("pt-BR")}</p></div></div>
+        <div className="flex items-center gap-5"><span className={`flex items-center gap-2 text-xs font-medium ${status.color}`}><StatusIcon className="h-4 w-4" />{status.label}</span><span className="font-semibold text-white">R$ {Number(entry.order.totalAmount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span></div>
+      </button>
+      <div className="mt-4 flex flex-wrap gap-2 text-[11px] text-muted-foreground"><span className="rounded-full bg-white/5 px-3 py-1">Pagamento: {entry.payment?.status || "pending"}</span><span className="rounded-full bg-white/5 px-3 py-1">Fiscal: {entry.invoice?.status || "pending_configuration"}</span><span className="rounded-full bg-white/5 px-3 py-1">Licença: {entry.licenses[0]?.status || "pending_payment"}</span></div>
+      {expanded && <div className="mt-6 border-t border-border pt-5">
+        {detailsQuery.isLoading && <p className="text-sm text-muted-foreground">Carregando detalhes...</p>}
+        {detailsQuery.data && <div className="space-y-5">
+          <div className="space-y-2">{detailsQuery.data.items.map((item) => <div key={item.id} className="flex items-center justify-between text-sm"><span className="text-foreground/80">{item.productName} · {item.quantity} licença(s)</span><span className="text-white">R$ {Number(item.totalPrice || Number(item.unitPrice) * item.quantity).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span></div>)}</div>
+          {detailsQuery.data.licenses.map((license) => <div key={license.id} className="rounded-2xl border border-white/7 bg-white/[0.02] p-4"><div className="flex items-center gap-2"><KeyRound className="h-4 w-4 text-[#54d6c7]" /><p className="text-sm font-medium text-white">Licença #{license.id}</p></div><p className="mt-2 text-xs text-muted-foreground">Status: {license.status}</p>{license.licenseKey && <div className="mt-4 rounded-xl bg-black/30 p-3 font-mono text-sm text-[#54d6c7]">{license.licenseKey}</div>}{license.downloadUrl && <a href={license.downloadUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#58a9ff]"><Download className="h-4 w-4" />Download oficial</a>}{license.installationInstructions && <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{license.installationInstructions}</p>}{license.status === "awaiting_vendor" && <p className="mt-4 text-sm text-amber-200/80">Pagamento confirmado. A ativação oficial aguarda o fornecedor.</p>}</div>)}
+          {detailsQuery.data.invoice?.status === "issued" && detailsQuery.data.invoice.pdfUrl && <a href={detailsQuery.data.invoice.pdfUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-[#ec70b9]"><FileText className="h-4 w-4" />Baixar nota fiscal</a>}
+          <Link href={`/checkout/${entry.order.id}`} className="inline-flex text-sm font-semibold text-[#58a9ff]">Acompanhar pedido completo</Link>
+        </div>}
+      </div>}
+    </article>
+  );
+}
 
 export default function Account() {
   const { user, isAuthenticated, logout } = useAuth({ redirectOnUnauthenticated: true });
-  const ordersQuery = trpc.orders.myOrders.useQuery(undefined, { enabled: isAuthenticated });
-  const orders = ordersQuery.data || [];
+  const ordersQuery = trpc.checkout.myOrders.useQuery(undefined, { enabled: isAuthenticated });
+  const entries = ordersQuery.data || [];
+  const paid = entries.filter((entry) => entry.order.status === "paid");
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
-      <section className="pt-24 md:pt-32 pb-16 md:pb-24">
+      <main className="pb-20 pt-24 md:pt-32">
         <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            {/* Profile Header */}
-            <div className="flex items-center justify-between mb-12">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-[#0071E3]/10 flex items-center justify-center">
-                  <User className="w-7 h-7 text-[#0071E3]" />
-                </div>
-                <div>
-                  <h1 className="text-title text-foreground">{user?.name || "Minha Conta"}</h1>
-                  <p className="text-sm text-muted-foreground">{user?.email}</p>
-                </div>
-              </div>
-              <button
-                onClick={() => logout()}
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <LogOut className="w-4 h-4" /> Sair
-              </button>
-            </div>
+          <header className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-4"><div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#58a9ff]/10"><User className="h-7 w-7 text-[#58a9ff]" /></div><div><h1 className="text-3xl font-semibold text-white">{user?.name || "Minha conta"}</h1><p className="mt-1 text-sm text-muted-foreground">{user?.email}</p></div></div><button onClick={() => logout()} className="inline-flex items-center gap-2 text-sm text-muted-foreground"><LogOut className="h-4 w-4" />Sair</button></header>
 
-            {/* Quick Stats with animated counters */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-              <div className="bento-card !p-5 text-center">
-                <p className="text-2xl font-bold text-foreground">
-                  <AnimatedCounter end={orders.length} duration={1500} />
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Pedidos Realizados</p>
-              </div>
-              <div className="bento-card !p-5 text-center">
-                <p className="text-2xl font-bold text-foreground">
-                  <AnimatedCounter end={orders.filter(o => o.status === "paid").length} duration={1500} />
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Produtos Ativos</p>
-              </div>
-              <div className="bento-card !p-5 text-center">
-                <p className="text-2xl font-bold text-foreground">
-                  <AnimatedCounter
-                    end={orders.filter(o => o.status === "paid").reduce((s, o) => s + parseFloat(o.totalAmount), 0)}
-                    duration={2000}
-                    decimals={2}
-                    prefix="R$ "
-                  />
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Total Investido</p>
-              </div>
-            </div>
+          <div className="mt-10 grid gap-4 md:grid-cols-3"><div className="bento-card !p-5"><p className="text-2xl font-semibold text-white">{entries.length}</p><p className="mt-1 text-xs text-muted-foreground">Pedidos</p></div><div className="bento-card !p-5"><p className="text-2xl font-semibold text-white">{paid.length}</p><p className="mt-1 text-xs text-muted-foreground">Pagamentos confirmados</p></div><div className="bento-card !p-5"><p className="text-2xl font-semibold text-white">{paid.reduce((sum, entry) => sum + Number(entry.order.totalAmount), 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p><p className="mt-1 text-xs text-muted-foreground">Total confirmado</p></div></div>
 
-            {/* Purchased Products */}
-            {orders.filter(o => o.status === "paid").length > 0 && (
-              <div className="mb-12">
-                <h2 className="text-lg font-semibold text-foreground mb-6">Meus Produtos</h2>
-                <div className="bento-card !p-5">
-                  <p className="text-sm text-muted-foreground mb-3">Você tem acesso aos produtos dos pedidos pagos abaixo. Clique em um pedido para ver os itens.</p>
-                  <div className="space-y-2">
-                    {orders.filter(o => o.status === "paid").map(order => (
-                      <div key={order.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                        <span className="text-sm text-foreground">Pedido #{order.id}</span>
-                        <span className="text-xs text-green-400">Acesso Liberado</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Orders */}
-            <h2 className="text-lg font-semibold text-foreground mb-6">Histórico de Pedidos</h2>
-            {orders.length === 0 ? (
-              <div className="text-center py-16 bento-card">
-                <ShoppingCart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">Você ainda não realizou nenhum pedido.</p>
-                <Link href="/softwares">
-                  <span className="apple-btn apple-btn-primary text-sm">Explorar Produtos</span>
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {orders.map((order, index) => {
-                  const status = statusLabels[order.status] || statusLabels.pending;
-                  return (
-                    <motion.div
-                      key={order.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="bento-card !p-5"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
-                            <Package className="w-5 h-5 text-muted-foreground" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-foreground">Pedido #{order.id}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(order.createdAt).toLocaleDateString("pt-BR", {
-                                day: "2-digit",
-                                month: "long",
-                                year: "numeric",
-                              })}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <span className={`flex items-center gap-1.5 text-xs font-medium ${status.color}`}>
-                            {status.icon} {status.label}
-                          </span>
-                          <span className="text-sm font-semibold text-foreground">
-                            R$ {parseFloat(order.totalAmount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                          </span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
-          </motion.div>
+          <section className="mt-12"><h2 className="text-xl font-semibold text-white">Pedidos e licenças</h2>{ordersQuery.isLoading && <p className="mt-6 text-sm text-muted-foreground">Carregando pedidos...</p>}{entries.length === 0 && !ordersQuery.isLoading ? <div className="mt-6 rounded-3xl border border-border py-16 text-center"><ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground" /><p className="mt-4 text-muted-foreground">Você ainda não possui pedidos.</p><Link href="/produto/ampler" className="apple-btn apple-btn-primary mt-6 inline-flex px-6 py-3">Conhecer o Ampler</Link></div> : <div className="mt-6 space-y-4">{entries.map((entry) => <OrderCard key={entry.order.id} entry={entry} />)}</div>}</section>
         </div>
-      </section>
-
+      </main>
       <Footer />
     </div>
   );
