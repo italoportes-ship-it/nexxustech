@@ -139,4 +139,4 @@
 - [x] Criar testes de pedido, pagamento, webhook, idempotência, licença e falhas
 - [x] Criar documentação de Stripe sandbox, webhook e configuração fiscal
 - [x] Executar migração, testes, TypeScript, build e validação responsiva
-- [ ] Salvar checkpoint, publicar e validar em produção sem cobrança real
+- [x] Salvar checkpoint, publicar e validar em produção sem cobrança real
